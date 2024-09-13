@@ -19,7 +19,7 @@ Dockerfile-rclone为可以在容器重置时恢复数据的配置，需要设置
 rclone远程文件夹为huggingface:/qinglong   
 进入后台后需要新建个同步的计划任务代码为:  
 ```
-rclone sync /ql/data huggingface:/qinglong
+rclone delete huggingface:/qinglong/db/database.sqlite && rclone sync /ql/data huggingface:/qinglong
 ```
 备份时间可以根据自己的情况设置我这里设置每天1点更新: 0 1 1 * * * 
 
