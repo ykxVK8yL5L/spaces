@@ -14,7 +14,7 @@ ADMIN_PASSWORD:登陆密码
 RCLONE_CONF:rclone配置内容，可选   
 
 ## 注意 
-Dockerfile-rclone为可以在容器重置时恢复数据的配置，需要设置上面的RCLONE_CONF  
+docker-entrypoint-rclone.sh为可以在容器重置时恢复数据的配置，需要设置上面的RCLONE_CONF  
 其中名称为huggingface,文件夹为:/qinglong   
 rclone远程文件夹为huggingface:/qinglong   
 进入后台后需要新建个同步的计划任务代码为:  
