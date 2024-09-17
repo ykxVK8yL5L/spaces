@@ -51,43 +51,37 @@ echo -e "##########写入登陆信息############"
 echo "{ \"username\": \"$ADMIN_USERNAME\", \"password\": \"$ADMIN_PASSWORD\" }" > /ql/data/config/auth.json
 
 
+if [ -n "$RCLONE_CONF" ]; then
+  echo -e "##########同步备份############"
+  # 指定远程文件夹路径，格式为 remote:path
+  REMOTE_FOLDER="huggingface:/qinglong"
 
+  # 使用 rclone ls 命令列出文件夹内容，将输出和错误分别捕获
+  OUTPUT=$(rclone ls "$REMOTE_FOLDER" 2>&1)
 
+  # 获取 rclone 命令的退出状态码
+  EXIT_CODE=$?
 
-
-echo -e "##########同步备份############"
-# 指定远程文件夹路径，格式为 remote:path
-REMOTE_FOLDER="huggingface:/qinglong"
-
-# 使用 rclone ls 命令列出文件夹内容，将输出和错误分别捕获
-OUTPUT=$(rclone ls "$REMOTE_FOLDER" 2>&1)
-
-# 获取 rclone 命令的退出状态码
-EXIT_CODE=$?
-
-# 判断退出状态码
-if [ $EXIT_CODE -eq 0 ]; then
-  # rclone 命令成功执行，检查文件夹是否为空
-  if [ -z "$OUTPUT" ]; then
-    #为空不处理
-    #rclone sync --interactive /ql $REMOTE_FOLDER
-    echo "初次安装"
+  # 判断退出状态码
+  if [ $EXIT_CODE -eq 0 ]; then
+    # rclone 命令成功执行，检查文件夹是否为空
+    if [ -z "$OUTPUT" ]; then
+      #为空不处理
+      #rclone sync --interactive /ql $REMOTE_FOLDER
+      echo "初次安装"
+    else
+      #echo "文件夹不为空"
+      mkdir /ql/.tmp/data
+      rclone sync $REMOTE_FOLDER /ql/.tmp/data && real_time=true ql reload data
+    fi
+  elif [[ "$OUTPUT" == *"directory not found"* ]]; then
+    echo "错误：文件夹不存在"
   else
-    #echo "文件夹不为空"
-    mkdir /ql/.tmp/data
-    rclone sync $REMOTE_FOLDER /ql/.tmp/data && real_time=true ql reload data
+    echo "错误：$OUTPUT"
   fi
-elif [[ "$OUTPUT" == *"directory not found"* ]]; then
-  echo "错误：文件夹不存在"
 else
-  echo "错误：$OUTPUT"
+    echo "没有检测到Rclone配置信息"
 fi
-
-
-
-
-
-
 
 tail -f /dev/null
 
