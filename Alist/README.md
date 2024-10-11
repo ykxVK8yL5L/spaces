@@ -9,6 +9,8 @@ license: mit
 app_port : 5244
 ---
 
-默认登陆密码：Space secrets(Private):ALIST_ADMIN_PASSWORD
+默认登陆密码：Space secrets(Private):   
+ALIST_ADMIN_PASSWORD   
+RCLONE_CONF   
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
