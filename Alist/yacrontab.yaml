@@ -1,0 +1,10 @@
+defaults:
+  environment:
+    - key: PYTHONIOENCODING
+      value: utf-8
+
+jobs:
+  - name: backup
+    command: rclone sync /home/user/alist/data huggingface:/alist 
+    schedule: "5 1 * * *"
+    captureStdout: true
