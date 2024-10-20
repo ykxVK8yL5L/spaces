@@ -15,7 +15,7 @@ RCLONE_CONF:rclone配置内容，可选
 
 
 ## 20241020更新   
-加入services.json文件，可自行参照修改，添加更多的邮箱服务支持  
+加入services.json文件，可自行参照修改，添加更多的邮箱服务支持：serv00仅供参考，需要修改邮箱服务器为注册时收到的地址   
 新添加邮箱:   
 cock.li-Cock   
 serv00.com-Serv00   
