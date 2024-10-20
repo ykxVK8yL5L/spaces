@@ -112,6 +112,8 @@ RUN mkdir /ql/data && \
   chmod -R 777 /root 
 
 COPY --from=builder /tmp/build/node_modules/. /ql/node_modules/
+COPY services.json /ql/node_modules/nodemailer/lib/well-known/
+
 
 WORKDIR ${QL_DIR}
 
