@@ -252,6 +252,13 @@
         "port": 465,
         "secure": true
     },
+    
+    "Serv00": {
+        "domains": ["serv00.com"],
+        "host": "mail3.serv00.com",
+        "port": 465,
+        "secure": true
+    },
 
     "SES": {
         "host": "email-smtp.us-east-1.amazonaws.com",
