@@ -17,9 +17,9 @@ RCLONE_CONF:rclone配置内容，可选
 ## 20241020更新   
 加入services.json文件，可自行参照修改，添加更多的邮箱服务支持  
 新添加邮箱:   
-cock.li(Cock)
-serv00.com(Serv00)
-mail.com(Mail.com)
+cock.li-Cock   
+serv00.com-Serv00   
+mail.com-Mail.com   
 
 ## 注意 
 docker-entrypoint-rclone.sh为可以在容器重置时恢复数据的配置，需要设置上面的RCLONE_CONF  
