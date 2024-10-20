@@ -25,6 +25,13 @@
         "port": 465
     },
 
+    "Cock": {
+        "domains": ["cock.li"],
+        "host": "mail.cock.li",
+        "port": 465,
+        "secure": true
+    },
+
     "DebugMail": {
         "host": "debugmail.io",
         "port": 25
