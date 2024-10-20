@@ -13,6 +13,10 @@ ADMIN_USERNAME:登陆用户名
 ADMIN_PASSWORD:登陆密码   
 RCLONE_CONF:rclone配置内容，可选   
 
+
+## 20241020更新   
+加入services.json文件，可自行参照修改，添加更多的邮箱服务支持
+
 ## 注意 
 docker-entrypoint-rclone.sh为可以在容器重置时恢复数据的配置，需要设置上面的RCLONE_CONF  
 其中名称为huggingface,文件夹为:/qinglong   
