@@ -29,6 +29,8 @@ rclone远程文件夹为huggingface:/qinglong
 ```
 rclone delete huggingface:/qinglong/db/database.sqlite && rclone sync /ql/data huggingface:/qinglong
 ```
-备份时间可以根据自己的情况设置我这里设置每天1点更新: 0 1 1 * * * 
+备份时间可以根据自己的情况设置我这里设置每天1点更新: 0 1 1 * * *    
+
+如需安装linux依赖需要修改Dockerfile手动安装：搜索sshpass在下面继续添加即可。  
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
