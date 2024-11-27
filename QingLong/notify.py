@@ -28,7 +28,7 @@ try:
 
     # 检查影响的行数
     if cursor.rowcount > 0:
-        print(f"成功更新 {cursor.rowcount} 条记录。")
+        print(f"成功更新通知设置")
     else:
         print("没有找到符合条件的记录。")
 
