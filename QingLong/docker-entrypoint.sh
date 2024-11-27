@@ -4,7 +4,6 @@ dir_shell=/ql/shell
 . $dir_shell/share.sh
 . $dir_shell/env.sh
 
-
 echo -e "======================写入rclone配置========================\n"
 echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
 
@@ -81,6 +80,13 @@ if [ -n "$RCLONE_CONF" ]; then
   fi
 else
     echo "没有检测到Rclone配置信息"
+fi
+
+if [ -n "$NOTIFY_CONFIG" ]; then
+    python /notify.py
+    dir_root=/ql && source /ql/shell/api.sh && notify_api '青龙服务启动通知' '青龙面板成功启动'
+else
+    echo "没有检测到通知配置信息，不进行通知"
 fi
 
 tail -f /dev/null
