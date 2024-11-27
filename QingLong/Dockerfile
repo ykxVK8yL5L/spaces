@@ -113,7 +113,7 @@ RUN mkdir /ql/data && \
 
 COPY --from=builder /tmp/build/node_modules/. /ql/node_modules/
 COPY services.json /ql/node_modules/nodemailer/lib/well-known/
-
+COPY notify.py /notify.py
 
 WORKDIR ${QL_DIR}
 
