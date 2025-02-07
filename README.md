@@ -1,3 +1,6 @@
+# 在huggingface上部署Alist会秒封号 请勿使用！！！
+
+
 # spaces
 Huggingface的一些space代码   
 由于Huggingface的权限问题 Dockerfile均以非root用户执行，因此项目的Dockerfile并不能完美适应Dockerhub.    
