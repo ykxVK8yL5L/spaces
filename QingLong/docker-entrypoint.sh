@@ -47,8 +47,34 @@ echo -e "############################################################\n"
 
 
 echo -e "##########写入登陆信息############"
-echo "{ \"username\": \"$ADMIN_USERNAME\", \"password\": \"$ADMIN_PASSWORD\" }" > /ql/data/config/auth.json
+#echo "{ \"username\": \"$ADMIN_USERNAME\", \"password\": \"$ADMIN_PASSWORD\" }" > /ql/data/config/auth.json
+dir_root=/ql && source /ql/shell/api.sh 
+init_auth_info() {
+  local body="$1"
+  local tip="$2"
+  local currentTimeStamp=$(date +%s)
+  local api=$(
+    curl -s --noproxy "*" "http://0.0.0.0:5600/api/user/init?t=$currentTimeStamp" \
+      -X 'PUT' \
+      -H "Accept: application/json" \
+      -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36" \
+      -H "Content-Type: application/json;charset=UTF-8" \
+      -H "Origin: http://0.0.0.0:5700" \
+      -H "Referer: http://0.0.0.0:5700/crontab" \
+      -H "Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7" \
+      --data-raw "{$body}" \
+      --compressed
+  )
+  code=$(echo "$api" | jq -r .code)
+  message=$(echo "$api" | jq -r .message)
+  if [[ $code == 200 ]]; then
+    echo -e "${tip}成功🎉"
+  else
+    echo -e "${tip}失败(${message})"
+  fi
+}
 
+init_auth_info "\"username\": \"$ADMIN_USERNAME\", \"password\": \"$ADMIN_PASSWORD\"" "Change Password"
 
 if [ -n "$RCLONE_CONF" ]; then
   echo -e "##########同步备份############"
