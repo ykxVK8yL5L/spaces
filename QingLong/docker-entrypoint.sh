@@ -115,6 +115,10 @@ else
     echo "没有检测到通知配置信息，不进行通知"
 fi
 
+#pm2 start code-server --name "code-server" -- --bind-addr 0.0.0.0:7860 --port 7860
+export PASSWORD=$ADMIN_PASSWORD
+code-server --bind-addr 0.0.0.0:7860 --port 7860
+
 tail -f /dev/null
 
 exec "$@"

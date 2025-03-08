@@ -53,6 +53,18 @@ RUN set -x && \
   apt-get upgrade -y && \
   apt-get install --no-install-recommends -y git \
   curl \
+  sudo \
+  build-essential \
+  default-jdk \
+  default-jre \
+  g++ \
+  gcc \
+  libzbar0 \
+  fish \
+  ffmpeg \
+  nmap \
+  ca-certificates \
+  zsh \
   cron \
   wget \
   tzdata \
@@ -81,6 +93,14 @@ RUN set -x && \
   chmod u+s /usr/sbin/cron && \
   ulimit -c 0
 
+
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.96.4
+
+# Install ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+
 ARG SOURCE_COMMIT
 RUN git clone --depth=1 -b ${QL_BRANCH} ${QL_URL} ${QL_DIR} && \
   cd ${QL_DIR} && \
@@ -94,6 +114,7 @@ RUN git clone --depth=1 -b ${QL_BRANCH} ${QL_URL} ${QL_DIR} && \
   rm -f ${QL_DIR}/docker/docker-entrypoint.sh
 
 COPY docker-entrypoint.sh ${QL_DIR}/docker
+COPY front.conf ${QL_DIR}/docker/front.conf
 
 RUN mkdir /ql/data && \
   mkdir /ql/data/config && \
@@ -115,14 +136,36 @@ COPY --from=builder /tmp/build/node_modules/. /ql/node_modules/
 COPY services.json /ql/node_modules/nodemailer/lib/well-known/
 COPY notify.py /notify.py
 
+
+
+# Create a user to run code-server
+RUN useradd -m -s /bin/zsh coder && \
+    echo 'coder ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Create code-server configuration directory
+RUN mkdir -p /home/coder/.local/share/code-server/User
+RUN chmod -R 777 /home/coder
+
+# Add settings.json to enable dark mode
+RUN echo '{ \
+   "workbench.colorTheme": "Default Dark Modern", \
+    "telemetry.enableTelemetry": true, \
+    "telemetry.enableCrashReporter": true \
+}' > /home/coder/.local/share/code-server/User/settings.json
+
+# Change ownership of the configuration directory
+RUN chown -R coder:coder /home/coder/.local/share/code-server
+
+# Install Python extension for code-server
+#RUN sudo -u coder code-server --install-extension ms-python.python
+
+# Switch to the coder user for running code-server
+USER coder
+
+ENV HOME=/home/coder \
+	PATH=/home/coder/.local/bin:$PATH
+
 WORKDIR ${QL_DIR}
-
-
-# Set up a new user named "user" with user ID 1000
-RUN useradd -m -u 1000 user
-
-# Switch to the "user" user
-USER user
 
 # 创建rclone配置文件
 RUN rclone config -h
