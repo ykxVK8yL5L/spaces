@@ -15,7 +15,7 @@ RCLONE_CONF:rclone配置内容，可选
 NOTIFY_CONFIG:通知配置内容，可选，需要到通知设置里抓包
 
 ## 20250308更新   
-加入coder-server 密码同青龙面板
+加入coder-server 密码同青龙面板 管理地址为:/coder/
 
 ## 20241020更新   
 加入services.json文件，可自行参照修改，添加更多的邮箱服务支持：serv00仅供参考，需要修改邮箱服务器为注册时收到的地址   
