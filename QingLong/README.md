@@ -7,6 +7,9 @@ sdk: docker
 pinned: false
 app_port: 5700
 ---
+演示视频： https://youtu.be/fGxS3GOmI3Y?si=8LtETCU_EeSpbp8U  
+
+
 
 Space secrets(Private)说明:   
 ADMIN_USERNAME:登陆用户名   
