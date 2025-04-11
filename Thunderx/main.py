@@ -168,6 +168,13 @@ async def get_file_info(file_id: str):
 
 
 @api_router.post(
+    "/emptytrash", summary="清空回收站", description="清空回收站【慎用】", tags=["API"]
+)
+async def emptytrash():
+    return await THUNDERX_CLIENT.emptytrash()
+
+
+@api_router.post(
     "/offline", summary="添加离线任务", description="添加离线任务", tags=["API"]
 )
 async def offline(item: OfflineRequest):
