@@ -142,33 +142,52 @@ async def init_client():
             )
 
 
-@front_router.get("/", response_class=HTMLResponse)
+@front_router.get(
+    "/",
+    response_class=HTMLResponse,
+    summary="前台页面",
+    description="前台管理页面，需要在设置里设置SECRET_TOKEN才能正常请求",
+    tags=["前端"],
+)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@api_router.post("/files")
+@api_router.post("/files", summary="文件列表", description="获取文件列表", tags=["API"])
 async def get_files(item: FileRequest):
     return await THUNDERX_CLIENT.file_list(
         item.size, item.parent_id, item.next_page_token, item.additional_filters
     )
 
 
-@api_router.get("/files/{file_id}")
+@api_router.get(
+    "/files/{file_id}", summary="文件信息", description="获取文件信息", tags=["API"]
+)
 async def get_file_info(file_id: str):
     return await THUNDERX_CLIENT.get_download_url(file_id)
 
 
-@api_router.post("/offline")
+@api_router.post(
+    "/offline", summary="添加离线任务", description="添加离线任务", tags=["API"]
+)
 async def offline(item: OfflineRequest):
     return await THUNDERX_CLIENT.offline_download(
         item.file_url, item.parent_id, item.name
     )
 
 
-@api_router.get("/userinfo")
+@api_router.get(
+    "/userinfo", summary="用户信息", description="获取用户登陆信息", tags=["API"]
+)
 async def userinfo():
     return THUNDERX_CLIENT.get_user_info()
+
+
+@api_router.get(
+    "/quota", summary="空间使用信息", description="获取空间使用信息", tags=["API"]
+)
+async def quota_info():
+    return THUNDERX_CLIENT.get_quota_info()
 
 
 app.include_router(front_router)
