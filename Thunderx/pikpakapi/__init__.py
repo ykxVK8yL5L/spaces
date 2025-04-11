@@ -437,6 +437,17 @@ class PikPakApi:
         result = await self._request_post(url, data)
         return result
 
+    async def emptytrash(self) -> Dict[str, Any]:
+        """
+        清空回收站
+        """
+        url = f"https://{self.PIKPAK_API_HOST}/drive/v1/files/trash:empty"
+        data = {}
+        captcha_result = await self.captcha_init(f"PATCH:/drive/v1/files/trash:empty")
+        self.captcha_token = captcha_result.get("captcha_token")
+        result = await self._request_patch(url, data)
+        return result
+
     async def delete_forever(self, ids: List[str]) -> Dict[str, Any]:
         """
         ids: List[str] - 文件夹、文件id列表
