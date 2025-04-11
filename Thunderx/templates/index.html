@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Task</title>
+    <link rel="stylesheet" type="text/css" href="https://www.unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/roboto-font@0.1.0/css/fonts.min.css" rel="stylesheet" />
+    <link href="//unpkg.com/layui@2.9.21/dist/css/layui.css" rel="stylesheet">
+</head>
+
+<body style="height:100%;">
+    <div id="root"></div>
+    <a id="back-to-top" href="#" class="btn btn-success btn-lg back-to-top" role="button"><i
+            class="mdi mdi-arrow-up"></i></a>
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://www.unpkg.com/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://www.unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/react-bootstrap@2.10.7/dist/react-bootstrap.min.js"></script>
+    <script src="https://unpkg.com/redux@4.2.1/dist/redux.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@5.3.0/umd/react-router-dom.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+    <script src="https://unpkg.com/regenerator-runtime@0.14.1/runtime.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+    <script src="https://unpkg.com/axios@1.7.9/dist/axios.min.js"></script>
+    <script src="//unpkg.com/layui@2.9.21/dist/layui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.17.1/ajv7.min.js"></script>
+    <script src="https://unpkg.com/@tanstack/react-query@4.36.1/build/umd/index.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mitt@3.0.1/dist/mitt.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+
+    <style>
+        .bi {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /*
+   * Sidebar
+   */
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar .offcanvas-lg {
+                position: -webkit-sticky;
+                position: sticky;
+                top: 48px;
+            }
+
+            .navbar-search {
+                display: block;
+            }
+        }
+
+        .sidebar .nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link.active {
+            color: #2470dc;
+        }
+
+        .sidebar-heading {
+            font-size: 0.75rem;
+        }
+
+        /*
+   * Navbar
+   */
+        .navbar {
+            background-color: teal;
+        }
+
+        .navbar-brand {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            /* background-color: rgba(0, 0, 0, .25); 
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25); */
+        }
+
+        .navbar .form-control {
+            padding: 0.75rem 1rem;
+        }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            width: 100%;
+            height: 3rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+                inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -0.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
+        }
+
+        .bd-mode-toggle {
+            z-index: 1500;
+        }
+
+        .bd-mode-toggle .dropdown-menu .active .bi {
+            display: block !important;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: none;
+        }
+
+        .leftsidebar {
+            height: 100%;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .leftsidebar {
+                min-width: 15%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .leftsidebar {
+                max-width: 50%;
+            }
+        }
+
+        .bg-teal {
+            background-color: teal;
+        }
+    </style>
+
+    <script type="text/babel" data-presets="react" data-type="module">
+        window.layer = layui.layer;
+        //事件监听开始  通过修改localstorage实现跨页面事件监听
+        const emitter = mitt();
+        // 监听 localStorage 变化
+        window.addEventListener("storage", (event) => {
+            if (event.key === "event") {
+                const { type, data } = JSON.parse(event.newValue);
+                emitter.emit(type, data);
+            }
+        });
+        // 封装 emit 方法
+        const emitEvent = (type, data) => {
+            // 触发本地事件
+            emitter.emit(type, data);
+            const randomString = Math.random()
+                .toString(36)
+                .substring(2, 10); // 生成一个随机字符串确保event每次的值不一样，如果一样会不触发事件
+            const identity = `${Date.now()}-${randomString}`;
+            // 存储到 localStorage，以便其他页面能够接收到
+            localStorage.setItem(
+                "event",
+                JSON.stringify({ type, data, identity })
+            );
+        };
+
+        // 封装 on 方法
+        const onEvent = (type, callback) => {
+            emitter.on(type, callback);
+        };
+
+        // 封装 off 方法
+        const offEvent = (type, callback) => {
+            emitter.off(type, callback);
+        };
+        //事件监听结束
+
+
+        Fancybox.bind("[data-fancybox]", {
+            Toolbar: {
+                display: {
+                    right: ["slideshow", "download", "thumbs", "close"],
+                },
+            },
+            Images: {
+                initialSize: "fit",
+            }
+        });
+
+
+        var settingStorage = localforage.createInstance({
+            name: "setting",
+            driver: localforage.LOCALSTORAGE
+        });
+        // settingStorage.setItem("category", { name: 'test', id: 1 });
+        // settingStorage.getItem('category').then(function (value) {
+        // 	console.log(value);
+        // }).catch(function (err) {
+        // 	console.log(err);
+        // });
+        // settingStorage.getItem('category', function (err, value) {
+        // 	console.log(value.name);
+        // });
+
+
+        const { createStore, combineReducers } = Redux;
+        // 从 localStorage 加载初始状态
+        const loadStateFromLocalStorage = () => {
+            try {
+                const serializedState = localStorage.getItem('settings');
+                if (serializedState === null) {
+                    return {}; // 默认值
+                }
+                return JSON.parse(serializedState);
+            } catch (e) {
+                console.error("Could not load state from localStorage:", e);
+                return {}; // 默认值
+            }
+        };
+        // 保存状态到 localStorage
+        const saveStateToLocalStorage = (state) => {
+            try {
+                const serializedState = JSON.stringify(state);
+                localStorage.setItem('settings', serializedState);
+            } catch (e) {
+                console.error("Could not save state to localStorage:", e);
+            }
+        };
+
+        // 定义初始状态
+        const initialSettingsState = loadStateFromLocalStorage();
+        // 创建 settings Reducer
+        function settingsReducer(state = initialSettingsState, action) {
+            switch (action.type) {
+                case 'SAVE_SETTING':
+                    return { ...state, ...action.payload };
+                default:
+                    return state;
+            }
+        }
+
+        // 合并 Reducer（如果有多个）
+        const rootReducer = combineReducers({
+            settings: settingsReducer,
+        });
+
+        // 创建 Redux Store
+        const STORE = createStore(rootReducer);
+
+        // 订阅 Store 的变化，并将状态保存到 localStorage
+        STORE.subscribe(() => {
+            saveStateToLocalStorage(STORE.getState().settings);
+        });
+
+
+        //数据校验
+        // var ajv = new ajv7.default()
+        // const schema = {
+        // 	type: "object",
+        // 	properties: {
+        // 		foo: { type: "integer" },
+        // 		bar: { type: "string" }
+        // 	},
+        // 	required: ["foo"],
+        // 	additionalProperties: false
+        // }
+
+        // const validate = ajv.compile(schema)
+
+        // const data = {
+        // 	foo: 1,
+        // 	bar: "abc"
+        // }
+        // const valid = validate(data)
+        // if (!valid) console.log(validate.errors)
+
+
+        const bytesToSize = (bytes) => {
+            if (bytes === 0) return '0 B';
+            var k = 1024;
+            sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            i = Math.floor(Math.log(bytes) / Math.log(k));
+            return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+        };
+        const formatDate = (date) => {
+            var d = new Date(date);
+            var year = d.getFullYear();
+            var month = d.getMonth() + 1;
+            var day = d.getDate() < 10 ? '0' + d.getDate() : '' + d.getDate();
+            var hour = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + seconds;
+        };
+
+        let layerLoading = null;
+
+        const showLoading = () => {
+            const loadindex = layer.load(1);
+            layerLoading = loadindex;
+        }
+
+        const hideLoading = () => {
+            layer.close(layerLoading);
+        }
+
+
+        const { useState, useEffect, useRef } = React;
+        const { HashRouter, Route, Link, Switch, useLocation, useParams } = ReactRouterDOM;
+        const { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } = ReactQuery;
+        const queryClient = new QueryClient()
+        const {
+            Alert,
+            Badge,
+            Button,
+            ButtonGroup,
+            ButtonToolbar,
+            Card,
+            Collapse,
+            Col,
+            Container,
+            Dropdown,
+            Form,
+            Image,
+            InputGroup,
+            ListGroup,
+            Modal,
+            Nav,
+            Navbar,
+            NavDropdown,
+            Offcanvas,
+            Pagination,
+            Row,
+            Table,
+        } = ReactBootstrap;
+        //注意修改js文件后需要直接访问js以更新浏览器缓存
+
+        // 表格组件
+        const DataTable = ({ data, columns }) => {
+            return (
+                <Table responsive bordered>
+                    <thead>
+                        <tr className="text-center">
+                            {columns.map((column, index) => (
+                                <th key={index}>{column.title}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.map((row, rowIndex) => (
+                            <tr key={rowIndex} className="text-center">
+                                {columns.map((column, colIndex) => (
+                                    <td key={colIndex}>
+                                        {/* 调用渲染方法，如果没有定义，则直接显示数据 */}
+                                        {column.render
+                                            ? column.render(row)
+                                            : row[column.dataIndex]}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            );
+        };
+        //分页组件
+        const Paginate = (props) => {
+            const page = props.page;
+            const pageCount = Math.ceil(
+                props.totalCount / props.itemsPerPage
+            );
+
+            const SelectItems = () => {
+                const pageNumbers = Array.from(
+                    { length: pageCount },
+                    (_, i) => i + 1
+                );
+                return (
+                    <select
+                        className="page-link border-0 h-100 py-0"
+                        style={{ width: "auto" }}
+                        onChange={(e) => {
+                            props.onClick(parseInt(e.target.value));
+                        }}
+                    >
+                        {pageNumbers.map((number) => {
+                            const selected = number === page ? true : false;
+                            return (
+                                <option
+                                    key={number}
+                                    value={number}
+                                    selected={selected}
+                                >
+                                    {number}
+                                </option>
+                            );
+                        })}
+                    </select>
+                );
+            };
+            return (
+                <div className="d-flex justify-content-center align-items-baseline">
+
+                    <Pagination>
+                        {pageCount > 1 && page > 1 && (
+                            <Pagination.First
+                                onClick={() => {
+                                    props.onClick(1);
+                                }}
+                            />
+                        )}
+                        {pageCount > 1 && page > 1 && (
+                            <Pagination.Prev
+                                onClick={() => {
+                                    props.onClick(page - 1);
+                                }}
+                            />
+                        )}
+                        <Pagination.Item linkClassName="p-0 h-100 d-inline-block">
+                            <SelectItems />
+                        </Pagination.Item>
+                        <Pagination.Item>
+                            <span className="text-info">
+                                {page}/{pageCount}
+                            </span>
+                        </Pagination.Item>
+                        {pageCount > 1 && page < pageCount && (
+                            <Pagination.Next
+                                onClick={() => {
+                                    props.onClick(page + 1);
+                                }}
+                            />
+                        )}
+                        {pageCount > 1 && page < pageCount && (
+                            <Pagination.Last
+                                onClick={() => {
+                                    props.onClick(pageCount);
+                                }}
+                            />
+                        )}
+                    </Pagination>
+                </div>
+            );
+        };
+        //图标组件
+        const Icon = (props) => {
+            return (
+                <span
+                    onClick={props.onClick}
+                    className={`mdi mdi-${props.icon} fs-${props.size} ${props.className}`}
+                ></span>
+            );
+        };
+        //按钮图标组件
+        const IconButton = (props) => {
+            return (
+                <Button
+                    variant="success"
+                    onClick={props.onClick}
+                    className={props.className}
+                >
+                    <span
+                        className={`mdi mdi-${props.icon} fs-${props.iconSize} ${props.iconClassName}`}
+                    ></span>
+                    {props.text}
+                </Button>
+            );
+        };
+        //video组件
+        const createCaption = (video) => {
+            var html = video.code + ' ' + video.title;
+            //html+="<a href='/tags'>test</a>";
+            video.tags.map(tag => {
+                html += tag;
+            })
+            return html;
+        };
+
+
+        const AsyncImage = (props) => {
+            const [loadedSrc, setLoadedSrc] = React.useState(null);
+            React.useEffect(() => {
+                setLoadedSrc(null);
+                if (props.src) {
+                    const handleLoad = () => {
+                        setLoadedSrc(props.src);
+                    };
+                    const image = document.createElement("img");
+                    image.addEventListener('load', handleLoad);
+                    image.src = props.src;
+                    return () => {
+                        image.removeEventListener('load', handleLoad);
+                    };
+                }
+            }, [props.src]);
+            if (loadedSrc === props.src) {
+                return (
+                    <img {...props} />
+                );
+            }
+            return <img {...props} src="https://placehold.co/600x400?text=Loading" />;
+        };
+
+        //设置框
+        const SettingModal = (props) => {
+            const settings = [
+                { "thunderx": [{ "label": "登陆令牌", "key": "secret_token", "show": false },{ "label": "代理地址", "key": "cf_proxy", "show": true }] },
+                { "github": [{ "label": "Actions地址", "key": "github_host", "show": true }, { "label": "Github令牌", "key": "github_token", "show": false }] },
+                { "directus": [{ "label": "Directus地址", "key": "directus_host", "show": true }, { "label": "Directus令牌", "key": "directus_token", "show": false }] }
+            ]
+            // const settings = [
+            //     { "thunderx": [{ "label": "代理地址", "key": "cf_proxy", "show": true }, { "label": "登陆令牌", "key": "secret_token", "show": false }] },
+            //     { "github": [{ "label": "Actions地址", "key": "github_host", "show": true }, { "label": "Github令牌", "key": "github_token", "show": false }] },
+            //     { "directus": [{ "label": "Directus地址", "key": "directus_host", "show": true }, { "label": "Directus令牌", "key": "directus_token", "show": false }] }
+            // ]
+            const [setting, setSetting] = useState({});
+            // useEffect(() => {
+            // 	localStorage.setItem('settings', JSON.stringify(setting));
+            // }, [setting]);
+
+            const loadSetting = () => {
+                const storedSettings = STORE.getState().settings;
+                if (storedSettings) {
+                    setSetting(storedSettings);
+                }
+            }
+            const saveSetting = () => {
+                STORE.dispatch({ type: 'SAVE_SETTING', payload: setting })
+                //localStorage.setItem('settings', JSON.stringify(setting));
+            }
+            return (
+                <Modal show={props.show} onHide={props.onHide} onShow={loadSetting}>
+                    <Modal.Header closeButton onHide={props.onHide}>
+                        <Modal.Title>设置</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <ListGroup>
+                                {settings.map((value, index) => {
+                                    const key = Object.keys(value)[0];
+                                    const items = value[key];
+                                    return (<ListGroup.Item>
+                                        {items.map((setting_item) => {
+                                            return (
+                                                <Form.Group as={Row} className="mb-3">
+                                                    <Form.Label column sm="3">
+                                                        {setting_item.label}
+                                                    </Form.Label>
+                                                    <Col sm="9">
+                                                        <Form.Control type={setting_item.show ? "input" : "password"} value={setting[setting_item.key]} name={setting_item.key} placeholder={setting_item.label} onChange={(e) => { setSetting({ ...setting, [setting_item.key]: e.target.value }) }} />
+                                                    </Col>
+                                                </Form.Group>
+                                            )
+                                        })}
+                                    </ListGroup.Item>)
+                                })}
+                            </ListGroup>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer className="justify-content-between">
+                        <Button
+                            variant="secondary"
+                            onClick={() => {
+                                props.onHide();
+                            }}
+                        >
+                            关闭
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={() => {
+                                saveSetting();
+                                props.onHide();
+                                //props.onSave();
+                            }}
+                        >
+                            保存
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            );
+        };
+
+        //axios封装开始
+        const useAxios = () => {
+            const [response, setResponse] = useState(null);
+            const [error, setError] = useState("");
+            const [loading, setLoading] = useState(false);
+
+            // Create an Axios instance
+            const axiosInstance = axios.create({});
+
+            // Set up request and response interceptors
+            axiosInstance.interceptors.request.use(
+                (config) => {
+                    // Log or modify request here
+                    //console.log("Sending request to:", config.url);
+                    return config;
+                },
+                (error) => {
+                    // Handle request error here
+                    return Promise.reject(error);
+                }
+            );
+
+            axiosInstance.interceptors.response.use(
+                (response) => {
+                    // Log or modify response here
+                    //console.log("Received response from:", response.config.url);
+                    return response;
+                },
+                (error) => {
+                    // Handle response error here
+                    return Promise.reject(error);
+                }
+            );
+
+            useEffect(() => {
+                const source = axios.CancelToken.source();
+                return () => {
+                    // Cancel the request when the component unmounts
+                    source.cancel(
+                        "组件被卸载: 请求取消."
+                    );
+                };
+            }, []);
+
+            // Making the API call with cancellation support
+            const fetchData = async ({ url, method, data, headers }) => {
+                setLoading(true);
+                try {
+                    const result = await axiosInstance({
+                        url,
+                        method,
+                        headers: headers ? headers : {},
+                        data:
+                            method.toLowerCase() === "get"
+                                ? undefined
+                                : data,
+                        params:
+                            method.toLowerCase() === "get"
+                                ? data
+                                : undefined,
+                        cancelToken: axios.CancelToken.source().token,
+                    });
+                    setResponse(result.data);
+                } catch (error) {
+                    if (axios.isCancel(error)) {
+                        console.log("Request cancelled", error.message);
+                    } else {
+                        setError(
+                            error.response
+                                ? error.response.data
+                                : error.message
+                        );
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            };
+            return [response, error, loading, fetchData];
+        };
+        //axios封闭结束
+
+        //分页hooks
+        const usePagination = () => {
+            const [pagination, setPagination] = useState({
+                pageSize: 36,
+                pageIndex: 1,
+            });
+            const { pageSize, pageIndex } = pagination;
+
+
+            return {
+                limit: pageSize,
+                onPaginationChange: setPagination,
+                pagination,
+                skip: pageSize * (pageIndex - 1),
+            };
+        }
+        //分页结束
+
+
+        //API定义开始
+        const getFiles = () => {
+            const [response, error, loading, fetchData] = useAxios();
+
+            const fetchDataByPage = async (setting, query) => {
+                fetchData({
+                    url: '/files',
+                    method: "POST",
+                    data: query,
+                    headers: {
+                        'Authorization': setting.secret_token,
+                        'Content-Type': 'application/json'
+                    },
+                });
+            };
+            return [response, error, loading, fetchDataByPage];
+        };
+
+        const paginateLinksGet = async (page_token, keyword) => {
+            //const url = `/files?size=${limit}&page=${page}&kw=${keyword}`;
+            console.log("======fuck========");
+            const url = `/files`;
+
+            const { data } = await axios.post(url,
+                 {
+                    "size": 100,
+                    "parent_id": "",
+                    "next_page_token": page_token,
+                    "additional_filters": {},
+                    "additionalProp1": {}
+                },
+                {
+                headers: {
+                    'Authorization': setting.secret_token,
+                    'Content-Type': 'application/json'
+                },
+            })
+            return data
+        }
+
+        const paginateFavoritesGet = async (limit, page, keyword) => {
+            const url = `/favorites?size=${limit}&page=${page}&kw=${keyword}`;
+            const { data } = await axios.get(url)
+            return data
+        }
+
+
+        const paginateTagLinksGet = async (limit, page, tag) => {
+            const url = `/tags?size=${limit}&page=${page}&tag=${tag}`;
+            const { data } = await axios.get(url)
+            return data
+        }
+
+        const paginateTasksGet = async (limit, skip) => {
+            const setting = STORE.getState().settings;
+            const url = setting.directus_host + `items/task?limit=${limit}&offset=${skip}&meta[]=filter_count&sort[]=-id`;
+            const { data } = await axios.get(url, { headers: { Authorization: "Bearer " + setting.directus_token } })
+            return data
+        }
+
+
+        //API定义结束
+
+        const Layout = ({ children }) => {
+            useEffect(() => {
+                // 组件挂载时执行的代码（相当于 componentDidMount）
+            }, []); // 空数组表示只在挂载和卸载时执行
+
+            const [showSideBar, setShowSideBar] = useState(false);
+            const handleSidebarClose = () => setShowSideBar(false);
+            const handleSidebarShow = () => setShowSideBar(true);
+            const toggleSidebarShow = () => {
+                setShowSideBar(!showSideBar);
+            };
+
+            const [setting, setSetting] = useState(false);
+
+            return (
+                <div>
+                    <header className="sticky-top">
+                        <Navbar expand="md">
+                            <Container fluid>
+                                <div>
+                                    <Navbar.Toggle
+                                        className="shadow-none border-0"
+                                        onClick={handleSidebarShow}
+                                        children={
+                                            <Icon
+                                                icon="menu"
+                                                size="3"
+                                                className="text-white"
+                                            />
+                                        }
+                                    />
+                                    <Navbar.Brand
+                                        as={Link}
+                                        to="/"
+                                        className="text-white"
+                                    >
+                                        文件列表
+                                    </Navbar.Brand>
+                                </div>
+                                <div className="d-flex">
+                                    <Tasks />
+                                    <LocalTasks />
+                                    <Button
+                                        style={{
+                                            backgroundColor: "transparent",
+                                        }}
+                                        className="nav-link btn"
+                                        onClick={() => {
+                                            setSetting(true)
+                                        }}
+                                        children={
+                                            <Icon
+                                                icon="dots-vertical"
+                                                size="3"
+                                                className="text-white"
+                                            />
+                                        }
+                                    ></Button>
+                                    <SettingModal
+                                        show={setting}
+                                        onHide={() => {
+                                            setSetting(false);
+                                        }}
+                                    />
+                                </div>
+                            </Container>
+                        </Navbar>
+                    </header>
+                    <Container fluid>
+                        <Row style={{ minHeight: "100vh" }}>
+                            <Col
+                                md="2"
+                                lg="2"
+                                xl="2"
+                                className="ps-0 d-none d-md-block"
+                            >
+                                <Offcanvas
+                                    className="leftsidebar h-100 bg-light"
+                                    show={showSideBar}
+                                    onHide={handleSidebarClose}
+                                    placement="start"
+                                    responsive="md"
+                                >
+                                    <Offcanvas.Header
+                                        className="py-2 border-bottom"
+                                        closeButton
+                                    >
+                                        <Offcanvas.Title>
+                                            离线任务
+                                        </Offcanvas.Title>
+                                    </Offcanvas.Header>
+                                    <Offcanvas.Body className="p-0">
+                                        <Container fluid className="p-0">
+                                            <Nav
+                                                activeKey="1"
+                                                className="flex-column"
+                                            >
+                                                <Nav.Link
+                                                    as={Link}
+                                                    className="nav-link text-dark"
+                                                    to="/"
+                                                    onClick={
+                                                        handleSidebarClose
+                                                    }
+                                                >
+                                                    <Icon
+                                                        icon="file"
+                                                        size="6"
+                                                        className="me-2"
+                                                    />
+                                                    文件列表
+                                                </Nav.Link>
+                                            </Nav>
+                                        </Container>
+                                    </Offcanvas.Body>
+                                </Offcanvas>
+                            </Col>
+
+                            <Col xs="12" sm="12" md="10" lg="10" xl="10">
+                                <main>
+                                    <Container fluid className="pt-2 px-0 pb-5">
+                                        {children}
+                                    </Container>
+                                </main>
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+            );
+        };
+        const Home = () => {
+            const location = useLocation();
+            const { id } = useParams();
+            return (
+                <div>
+                    <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+                        <label className="fs-3">Home</label>
+                        <ButtonToolbar
+                            aria-label="文件列表"
+                            className="bg-teal rounded"
+                        >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={() => {
+                                        alert("test")
+                                    }}
+                                    text="刷新"
+                                    className="bg-teal border-0"
+                                    icon="reload"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                                <IconButton
+                                    onClick={() => {
+                                        alert("hello");
+                                    }}
+                                    text="删除"
+                                    className="bg-teal border-0"
+                                    icon="delete-outline"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+                        </ButtonToolbar>
+                    </div>
+                    <Container fluid className="p-2"></Container>
+                </div>
+            );
+        };
+
+        const Videos = () => {
+            const [reload, setReload] = useState(false);
+            const [pageToken,setPageToken] = useState('');
+            const [keyword, setKeyword] = useState("")
+            const [search, setSearch] = useState("")
+            const [videos, setVideos] = useState([])
+            const setting = STORE.getState().settings;
+            const { id } = useParams();
+            const columns = [
+				{ title: "文件名称", dataIndex: "name" },
+				{ title: "大小", dataIndex: "size", render: (row) => (bytesToSize(Number(row.size))) },
+				{ title: "日期", dataIndex: "created_time", render: (row) => (formatDate(row.created_time)) },
+				{
+					title: "操作",
+					dataIndex: "name",
+					render: (row) => (
+						row.kind=="drive#folder" ? <Nav.Link
+							as={Link}
+							className="nav-link text-dark"
+							to={`/videos/${row.id}`}
+							target="_blank"
+						>
+							<Icon
+								icon="open-in-new"
+								size="6"
+								className="me-2"
+							/>
+						</Nav.Link> :
+							<Icon
+								icon="download-outline"
+								size="6"
+								className="me-2"
+								onClick={async () => {
+									let data = { "id": row.id }
+									await downloadMutation(data);
+								}}
+							/>
+					),
+				},
+			];
+            const authorization = 'Bearer '+setting.secret_token;
+            const { data: fileData, mutateAsync: downloadMutation } = useMutation({
+				mutationKey: ["get-download"],
+				mutationFn: async (fileinfo) => {
+					showLoading();
+					var url = '/files/'+fileinfo.id;
+					return await axios.get(url, {
+						headers: {
+							'Authorization': authorization,
+							'Content-Type': 'application/json'
+						},
+					})
+				},
+				onSuccess: async (data, variables, context) => {
+					hideLoading();
+				},
+				onError: () => {
+					hideLoading();
+				}
+			})
+            const { data: linksData, mutateAsync: filesMutation,error:linksError,isPending:linksLoading } = useMutation({
+                mutationKey: ["get-files",pageToken],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = '/files';
+                    return await axios.post(url, query, {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            useEffect(() => {
+            }, [pageToken, reload, search]);
+            useEffect(() => {
+                if (!setting.secret_token || setting.secret_token.length < 5) {
+					layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
+					return
+				}
+
+                let data = {
+                    "size": 100,
+                    "parent_id": id,
+                    "next_page_token": pageToken,
+                    "additional_filters": {},
+                    "additionalProp1": {}
+                }
+                
+                filesMutation(data);
+            }, []);
+            useEffect(() => {
+                if (linksData) {
+                    setPageToken(linksData.data.next_page_token)
+                    setVideos([...linksData.data.files])
+                }
+            }, [linksData]);
+
+
+            useEffect(() => {
+				if (fileData) {
+					emitEvent("addDownload", fileData)
+				}
+			}, [fileData]);
+
+            const handleSearchClick = () => {
+                setSearch(keyword)
+            };
+
+
+            const forceUpdate = () => {
+                setReload((pre) => !pre);
+            };
+
+            return (
+                <div>
+                    <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+                        <label className="fs-3">文件列表</label>
+                        <ButtonToolbar
+                            aria-label="文件列表"
+                            className="bg-teal rounded"
+                        >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={() => {
+                                        forceUpdate();
+                                    }}
+                                    text="刷新"
+                                    className="bg-teal border-0"
+                                    icon="reload"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+                        </ButtonToolbar>
+                    </div>
+                    {linksError && (
+                        <div className="text-center text-danger">
+                            发生错误，请稍后重试！！！
+                        </div>
+                    )}
+
+                    <Container fluid className="p-2">
+                        <InputGroup className="mb-3">
+                            <Form.Control
+                                placeholder="关键词"
+                                aria-label="关键词"
+                                aria-describedby="关键词"
+                                onChange={e => setKeyword(e.target.value)}
+                            />
+                            <Button variant="outline-secondary" id="button-addon2" onClick={() => { handleSearchClick() }}>
+                                搜索
+                            </Button>
+                        </InputGroup>
+
+                        {(linksLoading) && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <div className="text-center text-success">
+                                        正在努力加载中......
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        {linksData && (
+                            <Row>
+                                <DataTable data={videos ? videos : []} columns={columns} />
+                            </Row>
+                        )}
+
+                    </Container>
+                </div>
+            );
+        };
+
+
+       
+        const Tasks = () => {
+            const [show, setShow] = useState(false);
+            const handleClose = () => setShow(false);
+            const handleShow = () => setShow(true);
+            const [reload, setReload] = useState(false);
+            const { limit, onPaginationChange, skip, pagination } = usePagination();
+            const [meta, setMeta] = useState({ filter_count: 0 })
+            const [tasks, setTasks] = useState([])
+            const { data: tasksData, refetch: tasksRefetch, isLoading: tasksLoading, error: tasksError } = useQuery({
+                queryKey: ['get_paginate_tasks', limit, skip],
+                queryFn: () => paginateTasksGet(limit, skip),
+                enabled: show,
+            })
+
+            useEffect(() => {
+                //tasksRefetch()
+            }, [pagination, reload]);
+
+            useEffect(() => {
+                if (tasksData) {
+                    setMeta(tasksData.meta)
+                    setTasks([...tasksData.data])
+                }
+            }, [tasksData]);
+
+
+            const forceUpdate = () => {
+                setReload((pre) => !pre);
+            };
+
+            return (
+                <div>
+                    <Button
+                        style={{
+                            backgroundColor: "transparent",
+                        }}
+                        className="nav-link btn"
+                        onClick={handleShow}
+                        children={
+                            <span>
+                                <Icon
+                                    icon="cloud-download-outline"
+                                    size="3"
+                                    className="text-white"
+                                />
+                            </span>
+                        }
+                    ></Button>
+
+
+                    <Modal show={show} onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>远程下载任务</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body className="py-0">
+                            {tasksError && (
+                                <div className="text-center text-danger">
+                                    发生错误，请稍后重试！！！
+                                </div>
+                            )}
+                            {(tasksLoading) && (
+                                <div className="text-center text-success">
+                                    正在努力加载中......
+                                </div>
+                            )}
+                            <Container fluid className="p-2">
+                                <Row>
+                                    <Col xs={12}>
+                                        <Paginate page={pagination.pageIndex} onClick={(i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) }} itemsPerPage="36" totalCount={meta.filter_count} />
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col xs={12}>
+                                        <Table bordered hover>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>文件名</th>
+                                                    <th>状态</th>
+                                                </tr>
+                                            </thead>
+                                            {tasksData && (
+                                                <tbody>
+                                                    {tasks.map((task, index) => (
+                                                        <tr>
+                                                            <td>{task.id}</td>
+                                                            <td>{task.url.substr(task.url.indexOf('##') + 2)}</td>
+                                                            <td>{task.status == 'draft' ? <span className="text-warning">待下载</span> : <span class="text-success">正在下载中</span>}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            )}
+
+                                        </Table>
+
+                                    </Col>
+                                </Row>
+
+                                <Row>
+                                    <Col xs={12} className="py-2">
+                                        <Paginate page={pagination.pageIndex} onClick={(i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) }} itemsPerPage="36" totalCount={meta.filter_count} />
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </Modal.Body>
+                        <Modal.Footer className="justify-content-between">
+                            <Button variant="primary" onClick={() => { forceUpdate(); }}>
+                                刷新
+                            </Button>
+                            <Button variant="primary" onClick={() => {
+                                const setting = STORE.getState().settings;
+                                showLoading();
+                                axios.post(setting.github_host, { "ref": "main", "inputs": {} }, {
+                                    headers: {
+                                        'Authorization': "Bearer " + setting.github_token,
+                                        'Accept': 'application/vnd.github+json',
+                                        'X-GitHub-Api-Version': '2022-11-28',
+                                    },
+                                }).then(function (response) {
+                                    layer.msg('任务启动成功', { time: 2000, icon: 6 });
+                                    //console.log(response);
+                                })
+                                    .catch(function (error) {
+                                        console.log(error);
+                                    }).finally(() => {
+                                        hideLoading();
+                                    });
+                            }}>
+                                开始下载
+                            </Button>
+                            <Button variant="primary" onClick={handleClose}>
+                                关闭
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                </div >);
+        };
+
+
+
+
+
+
+
+
+        const LocalTasks = () => {
+            const [show, setShow] = useState(false);
+            const handleClose = () => setShow(false);
+            const handleShow = () => setShow(true);
+            const [downloads, setDownloads] = useState([])
+            const [addDownloadObject, setAddDownloadObject] = useState({})
+            const setting = STORE.getState().settings;
+            const columns = [
+                { title: "文件名称", dataIndex: "name" },
+                { title: "大小", dataIndex: "size", render: (row) => (bytesToSize(row.size)) },
+                { title: "日期", dataIndex: "created", render: (row) => (formatDate(row.created)) },
+                {
+                    title: "操作",
+                    dataIndex: "name",
+                    render: (row) => (
+                        <div>
+                            <Icon
+                                icon="delete-outline"
+                                size="6"
+                                className="me-2"
+                                onClick={() => {
+                                    layer.confirm('确定删除？该操作无法撤销!!!', { icon: 3 }, function (index) {
+                                        setDownloads(
+                                            downloads.filter(a =>
+                                                a.name !== row.name
+                                            )
+                                        );
+                                        layer.close(index);
+                                    }, function () {
+
+                                    });
+                                }}
+                            />
+                            <Icon
+                                icon="pencil-outline"
+                                size="6"
+                                className="me-2"
+                                onClick={() => {
+                                    layer.prompt({
+                                        title: '输入文件名称，并确认',
+                                        formType: 0,
+                                        value: row.name,
+                                        success: function (layero, index) {
+                                            $(".layui-layer").eq(0).css("top", "0px");
+                                            $("div[aria-modal]").eq(0).removeAttr("tabindex");//解决弹出窗的input无法获取焦点的问题
+                                        },
+                                        end: function (layero, index) {
+                                            $("div[aria-modal]").eq(0).attr("tabindex", -1).focus();//再把焦点还回去
+                                        }
+                                    }, function (value, index) {
+                                        const newDownloads = downloads.map(downloadItem => {
+                                            if (downloadItem.name === row.name) {
+                                                return {
+                                                    ...downloadItem,
+                                                    name: value
+                                                };
+                                            }
+                                            return downloadItem;
+                                        });
+                                        setDownloads(newDownloads);
+                                        layer.close(index);
+                                    });
+                                }}
+                            />
+                        </div>
+                    ),
+                },
+            ];
+
+
+            const { mutateAsync: localTaskdMutation } = useMutation({
+                mutationKey: ["get-download"],
+                mutationFn: async () => {
+                    showLoading();
+                    var host = setting.directus_host;
+                    if (!host.endsWith("/")) {
+                        host = host + '/'
+                    }
+                    var url = host + 'items/task';
+                    const tasks = downloads.map(task => {
+                        return { url: task.url + '##' + task.name }
+                    })
+                    return await axios.post(url, tasks, {
+                        headers: {
+                            'Authorization': "Bearer " + setting.directus_token,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                    layer.msg('任务添加成功', { time: 2000, icon: 6 });
+                },
+                onError: () => {
+                    hideLoading();
+                    layer.msg('任务添加失败', { time: 2000, icon: 5 });
+                }
+            })
+            const addDowload = (fileinfo) => {
+                const file = fileinfo.data;
+                var url = file.web_content_link;
+                for (const obj of file.medias) {
+                    if (obj.link.url.trim().length>10) { 
+                        url = obj.link.url;
+                        break;     
+                    }
+                }
+                const download = { name: file.name, size: Number(file.size),url:url, created: file.created_time }
+                setAddDownloadObject(download)
+            }
+            useEffect(() => {
+                if (addDownloadObject && ('name' in addDownloadObject)) {
+                    setDownloads([...downloads, addDownloadObject])
+                    setAddDownloadObject({})
+                }
+            }, [addDownloadObject]);
+            useEffect(() => {
+                onEvent("addDownload", addDowload)
+                settingStorage.getItem('downloads').then(function (value) {
+                    if (value) {
+                        setDownloads(value)
+                    }
+                }).catch(function (err) {
+                    console.log(err)
+                });
+            }, []);
+            useEffect(() => {
+                settingStorage.setItem('downloads', downloads)
+            }, [downloads]);
+
+
+            if (downloads.length > 0) {
+                return (
+                    <div>
+                        <Button
+                            style={{
+                                backgroundColor: "transparent",
+                            }}
+                            className="nav-link btn"
+                            onClick={handleShow}
+                            children={
+                                <span>
+                                    <Icon
+                                        icon="download"
+                                        size="3"
+                                        className="text-white"
+                                    />
+                                    <Badge bg="danger" style={{ top: '-15px', left: '-10px' }}>{downloads.length}</Badge>
+                                </span>
+                            }
+                        ></Button>
+
+
+                        <Modal show={show} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>本地下载任务</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {downloads && (
+                                    <DataTable data={downloads ? downloads : []} columns={columns} />
+                                )}
+                            </Modal.Body>
+                            <Modal.Footer className="justify-content-between">
+
+                                <ButtonGroup>
+                                    <Button variant="primary" onClick={async () => { await localTaskdMutation() }}>
+                                        添加转存
+                                    </Button>
+                                </ButtonGroup>
+
+                                <ButtonGroup>
+                                    <Button variant="danger" onClick={() => {
+                                        layer.confirm('确定删除？该操作无法撤销!!!', { icon: 3 }, function (index) {
+                                            setDownloads([]);
+                                            layer.close(index);
+                                        }, function () {
+
+                                        });
+                                    }}>
+                                        清空
+                                    </Button>
+                                    <Button variant="primary" onClick={handleClose}>
+                                        关闭
+                                    </Button>
+                                </ButtonGroup>
+
+
+                            </Modal.Footer>
+                        </Modal>
+
+                    </div >
+                );
+            }
+        }
+
+
+        App = () => {
+            const [open, setOpen] = useState(false);
+            const [reload, setReload] = useState(false);
+            const [response, error, loading, fetchDataByPage] = getFiles();
+            const { folder } = useParams();
+            const location = useLocation();
+            const [path, setPath] = useState(decodeURI(location.pathname));
+            const [page, setPage] = useState(1);
+            const [query, setQuery] = useState({ "path": path, "password": "", "page": page, "per_page": 0, "refresh": true });
+            const setting = STORE.getState().settings;
+
+
+            //const queryClient = useQueryClient()
+            // Queries
+            //const { data, error, isLoading, refetch } = useQuery({
+            //	queryKey: ['test'], queryFn: () => axios.get("")
+            //})
+
+            const { data: fileData, mutateAsync: downloadMutation } = useMutation({
+                mutationKey: ["get-download"],
+                mutationFn: async (fileinfo) => {
+                    showLoading();
+                    var host = setting.cf_proxy;
+                    if (!host.endsWith("/")) {
+                        host = host + '/'
+                    }
+                    var url = host + 'api/fs/get';
+                    return await axios.post(url, fileinfo, {
+                        headers: {
+                            'Authorization': setting.secret_token,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            useEffect(() => {
+                if (fileData) {
+                    emitEvent("addDownload", fileData)
+                }
+            }, [fileData]);
+
+
+            const columns = [
+                { title: "文件名称", dataIndex: "name" },
+                { title: "大小", dataIndex: "size", render: (row) => (bytesToSize(row.size)) },
+                { title: "日期", dataIndex: "created", render: (row) => (formatDate(row.created)) },
+                {
+                    title: "操作",
+                    dataIndex: "name",
+                    render: (row) => (
+                        row.is_dir ? <Nav.Link
+                            as={Link}
+                            className="nav-link text-dark"
+                            to={decodeURI(path + row.name + '/')}
+                            target="_blank"
+                        >
+                            <Icon
+                                icon="open-in-new"
+                                size="6"
+                                className="me-2"
+                            />
+                        </Nav.Link> :
+                            <Icon
+                                icon="download-outline"
+                                size="6"
+                                className="me-2"
+                                onClick={async () => {
+                                    let data = { "path": path + row.name, "password": "" }
+                                    await downloadMutation(data);
+                                }}
+                            />
+                    ),
+                },
+            ];
+            useEffect(() => {
+                if (!setting.secret_token || setting.secret_token.length < 5) {
+                    layer.alert("请先正确配置登陆令牌", { icon: 5 });
+                    return
+                }
+                fetchDataByPage(setting, query);
+                return () => { }
+            }, [reload, query]);
+
+
+            const forceUpdate = () => {
+                setReload((pre) => !pre);
+            };
+
+            return (
+                <div>
+                    <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+                        <label className="fs-3">文件列表</label>
+                        <ButtonToolbar
+                            aria-label="功能区"
+                            className="bg-teal rounded"
+                        >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={() => {
+                                        emitEvent("test", { a: 'b' })
+                                    }}
+                                    text="刷新"
+                                    className="bg-teal border-0"
+                                    icon="reload"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+                        </ButtonToolbar>
+                    </div>
+                    <Container fluid className="p-2">
+                        {error && (
+                            <div className="text-center text-danger">
+                                {error}
+                            </div>
+                        )}
+                        {(loading) && (
+                            <div className="text-center text-success">
+                                正在努力加载中......
+                            </div>
+                        )}
+                        {response && (
+                            <DataTable data={response.data.content ? response.data.content : []} columns={columns} />
+                        )}
+                    </Container>
+                </div>
+            );
+        };
+
+        const container = document.getElementById("root");
+        const root = ReactDOM.createRoot(container);
+        root.render(
+            <QueryClientProvider client={queryClient}>
+                <HashRouter>
+                    <Route path="/:path?">
+                        <Layout>
+                            <Switch>
+                                <Route path="/" exact component={Videos} />
+                                <Route path="/videos/:id?" exact component={Videos} />
+                            </Switch>
+                        </Layout>
+                    </Route>
+                </HashRouter>
+            </QueryClientProvider>
+        );
+
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 50) {
+                    $("#back-to-top").fadeIn();
+                } else {
+                    $("#back-to-top").fadeOut();
+                }
+            });
+            // scroll body to 0px on click
+            $("#back-to-top").click(function () {
+                $("body,html").animate(
+                    {
+                        scrollTop: 0,
+                    },
+                    400
+                );
+                return false;
+            });
+        });
+    </script>
+</body>
+
+</html>

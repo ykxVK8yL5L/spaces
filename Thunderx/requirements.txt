@@ -1,0 +1,15 @@
+fastapi
+pydantic-settings
+requests
+jinja2
+aiofiles
+uvicorn
+sqlalchemy
+fastapi-utilities
+bs4
+httpx
+datetime
+cachelib
+python-multipart
+hashids
+asyncio
