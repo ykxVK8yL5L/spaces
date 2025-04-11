@@ -187,7 +187,7 @@ async def userinfo():
     "/quota", summary="空间使用信息", description="获取空间使用信息", tags=["API"]
 )
 async def quota_info():
-    return THUNDERX_CLIENT.get_quota_info()
+    return await THUNDERX_CLIENT.get_quota_info()
 
 
 app.include_router(front_router)
