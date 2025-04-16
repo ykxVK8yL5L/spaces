@@ -33,8 +33,7 @@ DB_POSTGRESDB_SSL_CA: 数据库链接SSL证书内容
 
 Space variables (Public)说明:   
 GENERIC_TIMEZONE=Asia/Shanghai  :时区   
-TZ=Asia/Shanghai   :时区   
-DB_TABLE_PREFIX=n8n_    :数据库表前缀   
+TZ=Asia/Shanghai   :时区     
 N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true   :重置文件权限   
 WEBHOOK_URL=https://用户名-space名.hf.space     
 
