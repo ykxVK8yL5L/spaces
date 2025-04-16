@@ -10,7 +10,7 @@ echo "$RCLONE_CONF" > /root/.config/rclone/rclone.conf
 if [ -n "$RCLONE_CONF" ]; then
   echo -e "##########同步备份############"
   # 指定远程文件夹路径，格式为 remote:path
-  REMOTE_FOLDER="n8n:/"
+  REMOTE_FOLDER="huggingface:/n8n"
 
   # 使用 rclone ls 命令列出文件夹内容，将输出和错误分别捕获
   OUTPUT=$(rclone ls "$REMOTE_FOLDER" 2>&1)
