@@ -4,7 +4,7 @@
 
 
 echo -e "======================写入rclone配置========================\n"
-echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
+echo "$RCLONE_CONF" > /root/.config/rclone/rclone.conf
 
 
 if [ -n "$RCLONE_CONF" ]; then
