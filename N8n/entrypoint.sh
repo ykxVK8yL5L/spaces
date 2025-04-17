@@ -26,7 +26,7 @@ if [ -n "$RCLONE_CONF" ]; then
       #rclone sync --interactive /ql $REMOTE_FOLDER
       echo "初次安装"
     else
-      rclone sync $REMOTE_FOLDER /root/.n8n
+      rclone sync $REMOTE_FOLDER /home/node/.n8n
     fi
   elif [[ "$OUTPUT" == *"directory not found"* ]]; then
     echo "错误：文件夹不存在"
