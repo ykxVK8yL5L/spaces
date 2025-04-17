@@ -41,5 +41,9 @@ Space secrets(Private)说明:
 N8N_ENCRYPTION_KEY:  加密密钥【需要保存，如不保存以后重置数据无法恢复】   
 RCLONE_CONF:rclone配置内容，可选，用来同步数据  
 
+同步配置目录命令   
+```
+rclone sync /home/node/.n8n huggingface:/n8n --create-empty-src-dirs
+```
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
