@@ -48,7 +48,7 @@ RUN npm install -g n8n@1.86.1
 RUN mkdir -p $DATABASE_PATH $CONFIG_PATH $WORKFLOWS_PATH $LOGS_PATH \
     && chmod -R 777 $BASE_PATH
 
-
+RUN mkdir -p /home/node/.config && chmod -R 777 /home/node/.config
 
 COPY entrypoint.sh /entrypoint.sh
 
