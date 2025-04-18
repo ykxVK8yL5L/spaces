@@ -46,4 +46,14 @@ RCLONE_CONF:rclone配置内容，可选，用来同步数据
 rclone sync /home/node/.n8n huggingface:/n8n --create-empty-src-dirs
 ```
 
+### 以下为参考环境变量
+EXECUTIONS_DATA_PRUNE=true     //是否开启自动清理运行日志   
+EXECUTIONS_DATA_MAX_AGE=168   //几小时后删除运行日志    
+EXECUTIONS_DATA_PRUNE_MAX_COUNT=50000   //保留的日志条数   
+
+
+
+
+
+
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
