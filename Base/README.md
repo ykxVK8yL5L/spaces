@@ -10,9 +10,9 @@ app_port: 5700
 
 
 ## 以Code Serer为核心的用nginx做为反代来部署多个服务
-目前已经添加服务
-n8n地址:/
-Code Server:/coder/
+目前已经添加服务   
+n8n地址:/   
+Code Server:/coder/   
 
 
 ## 如使用Rclone方法需要设置:
