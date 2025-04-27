@@ -908,41 +908,6 @@ class PikPakApi:
         )
         return result
 
-    async def file_batch_share(
-        self,
-        ids: List[str],
-        need_password: Optional[bool] = False,
-        expiration_days: Optional[int] = -1,
-    ) -> Dict[str, Any]:
-        """
-        ids: List[str] - 文件id列表
-        need_password: Optional[bool] - 是否需要分享密码
-        expiration_days: Optional[int] - 分享天数
-
-        批量分享文件，并生成分享链接
-        返回数据结构：
-        {
-            "share_id": "xxx", //分享ID
-            "share_url": "https://mypikpak.com/s/xxx", // 分享链接
-            "pass_code": "53fe", // 分享密码
-            "share_text": "https://mypikpak.com/s/xxx",
-            "share_list": []
-        }
-        """
-        data = {
-            "file_ids": ids,
-            "share_to": "encryptedlink" if need_password else "publiclink",
-            "expiration_days": expiration_days,
-            "pass_code_option": "REQUIRED" if need_password else "NOT_REQUIRED",
-        }
-        captcha_result = await self.captcha_init(f"GET:/drive/v1/share")
-        self.captcha_token = captcha_result.get("captcha_token")
-        result = await self._request_post(
-            url=f"https://{self.PIKPAK_API_HOST}/drive/v1/share",
-            data=data,
-        )
-        return result
-
     async def get_quota_info(self) -> Dict[str, Any]:
         """
         获取当前空间的quota信息
@@ -995,6 +960,87 @@ class PikPakApi:
         self.captcha_token = captcha_result.get("captcha_token")
         result = await self._request_get(url)
         return result
+
+    async def file_batch_share(
+        self,
+        ids: List[str],
+        need_password: Optional[bool] = False,
+        expiration_days: Optional[int] = -1,
+    ) -> Dict[str, Any]:
+        """
+        ids: List[str] - 文件id列表
+        need_password: Optional[bool] - 是否需要分享密码
+        expiration_days: Optional[int] - 分享天数
+
+        批量分享文件，并生成分享链接
+        返回数据结构：
+        {
+            "share_id": "xxx", //分享ID
+            "share_url": "https://mypikpak.com/s/xxx", // 分享链接
+            "pass_code": "53fe", // 分享密码
+            "share_text": "https://mypikpak.com/s/xxx",
+            "share_list": []
+        }
+        """
+        data = {
+            "file_ids": ids,
+            "share_to": "copy",
+            "restore_limit": "-1",
+            "expiration_days": "-1",
+            "expiration_days": expiration_days,
+            "pass_code_option": "REQUIRED" if need_password else "NOT_REQUIRED",
+        }
+        captcha_result = await self.captcha_init(f"POST:/drive/v1/share")
+        self.captcha_token = captcha_result.get("captcha_token")
+        result = await self._request_post(
+            url=f"https://{self.PIKPAK_API_HOST}/drive/v1/share",
+            data=data,
+        )
+        return result
+
+    async def file_batch_delete(
+        self,
+        ids: List[str],
+    ) -> Dict[str, Any]:
+        """
+        ids: List[str] - 文件id列表
+
+        批量分享文件，并生成分享链接
+        返回数据结构：
+        {
+            "share_id": "xxx", //分享ID
+            "share_url": "https://mypikpak.com/s/xxx", // 分享链接
+            "pass_code": "53fe", // 分享密码
+            "share_text": "https://mypikpak.com/s/xxx",
+            "share_list": []
+        }
+        """
+        data = {
+            "ids": ids,
+        }
+        captcha_result = await self.captcha_init(f"POST:/drive/v1/share:batchDelete")
+        self.captcha_token = captcha_result.get("captcha_token")
+        result = await self._request_post(
+            url=f"https://{self.PIKPAK_API_HOST}/drive/v1/share:batchDelete",
+            data=data,
+        )
+        return result
+
+    async def get_share_list(
+        self, next_page_token: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        获取账号下所有分享信息
+        """
+        data = {
+            "limit": "100",
+            "thumbnail_size": "SIZE_SMALL",
+            "page_token": next_page_token,
+        }
+        url = f"https://{self.PIKPAK_API_HOST}/drive/v1/share/list"
+        captcha_result = await self.captcha_init(f"GET:/drive/v1/share/list")
+        self.captcha_token = captcha_result.get("captcha_token")
+        return await self._request_get(url, params=data)
 
     async def get_share_folder(
         self, share_id: str, pass_code_token: str, parent_id: str = None
