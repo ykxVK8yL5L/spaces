@@ -153,7 +153,9 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@api_router.post("/files", summary="文件列表", description="获取文件列表", tags=["API"])
+@api_router.post(
+    "/files", summary="文件列表", description="获取文件列表", tags=["文件"]
+)
 async def get_files(item: FileRequest):
     return await THUNDERX_CLIENT.file_list(
         item.size, item.parent_id, item.next_page_token, item.additional_filters
@@ -161,21 +163,85 @@ async def get_files(item: FileRequest):
 
 
 @api_router.get(
-    "/files/{file_id}", summary="文件信息", description="获取文件信息", tags=["API"]
+    "/files/{file_id}", summary="文件信息", description="获取文件信息", tags=["文件"]
 )
 async def get_file_info(file_id: str):
     return await THUNDERX_CLIENT.get_download_url(file_id)
 
 
 @api_router.post(
-    "/emptytrash", summary="清空回收站", description="清空回收站【慎用】", tags=["API"]
+    "/emptytrash", summary="清空回收站", description="清空回收站【慎用】", tags=["文件"]
 )
 async def emptytrash():
     return await THUNDERX_CLIENT.emptytrash()
 
 
+##############  分享 ################
 @api_router.post(
-    "/offline", summary="添加离线任务", description="添加离线任务", tags=["API"]
+    "/get_share_list",
+    summary="获取账号分享列表",
+    description="获取账号分享列表",
+    tags=["分享"],
+)
+async def get_share_list(page_token: str | None = None):
+    return await THUNDERX_CLIENT.get_share_list(page_token)
+
+
+@api_router.post(
+    "/file_batch_share", summary="创建分享", description="创建分享", tags=["分享"]
+)
+async def file_batch_share(
+    ids: List[str] = None,
+    need_password: bool | None = False,
+    expiration_days: int | None = -1,
+):
+    return await THUNDERX_CLIENT.file_batch_share(ids, need_password, expiration_days)
+
+
+@api_router.post(
+    "/file_batch_delete", summary="取消分享", description="取消分享", tags=["分享"]
+)
+async def file_batch_delete(ids: List[str]):
+    return await THUNDERX_CLIENT.file_batch_delete(ids)
+
+
+@api_router.post(
+    "/get_share_folder",
+    summary="获取分享信息",
+    description="获取分享信息",
+    tags=["分享"],
+)
+async def get_share_folder(
+    share_id: str, pass_code_token: str | None = None, parent_id: str | None = None
+):
+    return await THUNDERX_CLIENT.get_share_folder(share_id, pass_code_token, parent_id)
+
+
+@api_router.post(
+    "/restore", summary="转存分享文件", description="转存分享文件", tags=["分享"]
+)
+async def restore(
+    share_id: str, pass_code_token: str | None = None, file_ids: List[str] | None = None
+):
+    return await THUNDERX_CLIENT.restore(share_id, pass_code_token, file_ids)
+
+
+##############  离线任务 ################
+
+
+@api_router.get(
+    "/offline", summary="离线任务列表", description="离线任务列表", tags=["离线任务"]
+)
+async def offline_list(size: int = 10000, next_page_token: str | None = None):
+    return await THUNDERX_CLIENT.offline_list(
+        size=size,
+        next_page_token=next_page_token,
+        phase=None,
+    )
+
+
+@api_router.post(
+    "/offline", summary="添加离线任务", description="添加离线任务", tags=["离线任务"]
 )
 async def offline(item: OfflineRequest):
     return await THUNDERX_CLIENT.offline_download(
@@ -183,18 +249,36 @@ async def offline(item: OfflineRequest):
     )
 
 
+@api_router.post(
+    "/delete_tasks",
+    summary="删除离线任务",
+    description="删除离线任务",
+    tags=["离线任务"],
+)
+async def delete_tasks(task_ids: List[str], delete_files: bool = False):
+    return await THUNDERX_CLIENT.delete_tasks(task_ids, delete_files)
+
+
+##############  账号 ################
 @api_router.get(
-    "/userinfo", summary="用户信息", description="获取用户登陆信息", tags=["API"]
+    "/userinfo", summary="用户信息", description="获取用户登陆信息", tags=["账号"]
 )
 async def userinfo():
     return THUNDERX_CLIENT.get_user_info()
 
 
 @api_router.get(
-    "/quota", summary="空间使用信息", description="获取空间使用信息", tags=["API"]
+    "/quota", summary="空间使用信息", description="获取空间使用信息", tags=["账号"]
 )
 async def quota_info():
     return await THUNDERX_CLIENT.get_quota_info()
+
+
+@api_router.get(
+    "/invite_code", summary="查看邀请码", description="查看邀请码", tags=["账号"]
+)
+async def get_invite_code():
+    return await THUNDERX_CLIENT.get_invite_code()
 
 
 app.include_router(front_router)
