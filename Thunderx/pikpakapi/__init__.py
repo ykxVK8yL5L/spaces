@@ -908,6 +908,7 @@ class PikPakApi:
         )
         return result
 
+  
     async def get_quota_info(self) -> Dict[str, Any]:
         """
         获取当前空间的quota信息
@@ -961,6 +962,7 @@ class PikPakApi:
         result = await self._request_get(url)
         return result
 
+
     async def file_batch_share(
         self,
         ids: List[str],
@@ -985,8 +987,8 @@ class PikPakApi:
         data = {
             "file_ids": ids,
             "share_to": "copy",
-            "restore_limit": "-1",
-            "expiration_days": "-1",
+            "restore_limit":"-1",
+            "expiration_days":"-1",
             "expiration_days": expiration_days,
             "pass_code_option": "REQUIRED" if need_password else "NOT_REQUIRED",
         }
@@ -998,7 +1000,7 @@ class PikPakApi:
         )
         return result
 
-    async def file_batch_delete(
+    async def share_batch_delete(
         self,
         ids: List[str],
     ) -> Dict[str, Any]:
@@ -1035,12 +1037,13 @@ class PikPakApi:
         data = {
             "limit": "100",
             "thumbnail_size": "SIZE_SMALL",
-            "page_token": next_page_token,
+            "page_token":next_page_token,
         }
         url = f"https://{self.PIKPAK_API_HOST}/drive/v1/share/list"
         captcha_result = await self.captcha_init(f"GET:/drive/v1/share/list")
         self.captcha_token = captcha_result.get("captcha_token")
         return await self._request_get(url, params=data)
+
 
     async def get_share_folder(
         self, share_id: str, pass_code_token: str, parent_id: str = None
