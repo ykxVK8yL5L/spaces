@@ -50,14 +50,13 @@ RUN apt-get update && \
     procps \
     netcat \
     sshpass \
-    rclone \
     unzip \
     git \
     make \
     chromium \
     libatomic1 
 
-
+RUN sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
 # Install Node.js (LTS version)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
