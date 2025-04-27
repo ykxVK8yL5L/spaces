@@ -917,6 +917,21 @@
                                                     />
                                                     文件列表
                                                 </Nav.Link>
+                                                <Nav.Link
+                                                    as={Link}
+                                                    className="nav-link text-dark"
+                                                    to="/shares"
+                                                    onClick={
+                                                        handleSidebarClose
+                                                    }
+                                                >
+                                                    <Icon
+                                                        icon="share-variant"
+                                                        size="6"
+                                                        className="me-2"
+                                                    />
+                                                    分享列表
+                                                </Nav.Link>
                                             </Nav>
                                         </Container>
                                     </Offcanvas.Body>
@@ -991,7 +1006,9 @@
 					title: "操作",
 					dataIndex: "name",
 					render: (row) => (
-						row.kind=="drive#folder" ? <Nav.Link
+                        <div className="d-flex justify-content-center">
+						{
+                            row.kind=="drive#folder" ? (<Nav.Link
 							as={Link}
 							className="nav-link text-dark"
 							to={`/videos/${row.id}`}
@@ -1002,8 +1019,8 @@
 								size="6"
 								className="me-2"
 							/>
-						</Nav.Link> :
-							<Icon
+						</Nav.Link>) :
+							(<Icon
 								icon="download-outline"
 								size="6"
 								className="me-2"
@@ -1011,7 +1028,20 @@
 									let data = { "id": row.id }
 									await downloadMutation(data);
 								}}
+							/>)
+                        }
+
+
+                            <Icon
+								icon="share-variant"
+								size="6"
+								className="me-2"
+								onClick={async () => {
+									let data = { "id": row.id }
+									await sharedMutation(data);
+								}}
 							/>
+                        </div>
 					),
 				},
 			];
@@ -1035,6 +1065,26 @@
 					hideLoading();
 				}
 			})
+            const { data: shareData, mutateAsync: sharedMutation } = useMutation({
+				mutationKey: ["create_share"],
+				mutationFn: async (fileinfo) => {
+					showLoading();
+					var url = 'file_batch_share?need_password=false&expiration_days=-1';
+					return await axios.post(url,[fileinfo.id], {
+						headers: {
+							'Authorization': authorization,
+							'Content-Type': 'application/json'
+						},
+					})
+				},
+				onSuccess: async (data, variables, context) => {
+					hideLoading();
+				},
+				onError: () => {
+					hideLoading();
+				}
+			})
+            
             const { data: linksData, mutateAsync: filesMutation,error:linksError,isPending:linksLoading } = useMutation({
                 mutationKey: ["get-files",pageToken],
                 mutationFn: async (query) => {
@@ -1087,6 +1137,14 @@
 				}
 			}, [fileData]);
 
+            useEffect(() => {
+				if (shareData) {
+					layer.alert(shareData.data.share_url);
+				}
+			}, [shareData]);
+
+
+        
             const handleSearchClick = () => {
                 setSearch(keyword)
             };
@@ -1157,6 +1215,156 @@
             );
         };
 
+        const Shares = () => {
+            const [reload, setReload] = useState(false);
+            const [pageToken,setPageToken] = useState('');
+            const [keyword, setKeyword] = useState("")
+            const [search, setSearch] = useState("")
+            const [videos, setVideos] = useState([])
+            const setting = STORE.getState().settings;
+            const { id } = useParams();
+            const columns = [
+				{ title: "文件名称", dataIndex: "title" },
+				{ title: "分享ID", dataIndex: "share_id"},
+				{ title: "日期", dataIndex: "create_time", render: (row) => (formatDate(row.create_time)) },
+				{
+					title: "操作",
+					dataIndex: "name",
+					render: (row) => (
+							<Icon
+								icon="cancel"
+								size="6"
+								className="me-2"
+								onClick={async () => {
+									let data = { "id": row.share_id }
+									await deleteMutation(data);
+								}}
+							/>
+					),
+				},
+			];
+            const authorization = 'Bearer '+setting.secret_token;
+            const { data: fileData, mutateAsync: deleteMutation } = useMutation({
+				mutationKey: ["share_batch_delete"],
+				mutationFn: async (fileinfo) => {
+					showLoading();
+					var url = '/share_batch_delete';
+					return await axios.post(url, [fileinfo.id],{
+						headers: {
+							'Authorization': authorization,
+							'Content-Type': 'application/json'
+						},
+					})
+				},
+				onSuccess: async (data, variables, context) => {
+					hideLoading();
+                    forceUpdate();
+				},
+				onError: () => {
+					hideLoading();
+				}
+			})
+            const { data: linksData, mutateAsync: filesMutation,error:linksError,isPending:linksLoading } = useMutation({
+                mutationKey: ["get_share_list",pageToken],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = '/get_share_list';
+                    return await axios.post(url, query, {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            // useEffect(() => {
+
+            // }, [pageToken, reload]);
+            useEffect(() => {
+                if (!setting.secret_token || setting.secret_token.length < 5) {
+					layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
+					return
+				}
+
+                let data = {
+                    "size": 100,
+                    "parent_id": id,
+                    "next_page_token": pageToken,
+                    "additional_filters": {},
+                    "additionalProp1": {}
+                }
+                
+                filesMutation(data);
+            }, [pageToken, reload]);
+            useEffect(() => {
+                if (linksData) {
+                    setPageToken(linksData.data.next_page_token)
+                    setVideos([...linksData.data.data])
+                }
+            }, [linksData]);
+
+
+     
+
+            const forceUpdate = () => {
+                setReload((pre) => !pre);
+            };
+
+            return (
+                <div>
+                    <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+                        <label className="fs-3">分享列表</label>
+                        <ButtonToolbar
+                            aria-label="分享列表"
+                            className="bg-teal rounded"
+                        >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={() => {
+                                        forceUpdate();
+                                    }}
+                                    text="刷新"
+                                    className="bg-teal border-0"
+                                    icon="reload"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+                        </ButtonToolbar>
+                    </div>
+                    {linksError && (
+                        <div className="text-center text-danger">
+                            发生错误，请稍后重试！！！
+                        </div>
+                    )}
+
+                    <Container fluid className="p-2">
+                        {(linksLoading) && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <div className="text-center text-success">
+                                        正在努力加载中......
+                                    </div>
+                                </Col>
+                            </Row>
+                        )}
+                        {linksData && (
+                            <Row>
+                                <DataTable data={videos ? videos : []} columns={columns} />
+                            </Row>
+                        )}
+
+                    </Container>
+                </div>
+            );
+        };
 
        
         const Tasks = () => {
@@ -1647,6 +1855,7 @@
                         <Layout>
                             <Switch>
                                 <Route path="/" exact component={Videos} />
+                                <Route path="/shares" exact component={Shares} />
                                 <Route path="/videos/:id?" exact component={Videos} />
                             </Switch>
                         </Layout>
