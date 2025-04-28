@@ -565,7 +565,7 @@
         //设置框
         const SettingModal = (props) => {
             const settings = [
-                { "thunderx": [{ "label": "登陆令牌", "key": "secret_token", "show": false },{ "label": "代理地址", "key": "cf_proxy", "show": true }] },
+                { "thunderx": [{ "label": "登陆令牌", "key": "secret_token", "show": false }, { "label": "代理地址", "key": "cf_proxy", "show": true }] },
                 { "github": [{ "label": "Actions地址", "key": "github_host", "show": true }, { "label": "Github令牌", "key": "github_token", "show": false }] },
                 { "directus": [{ "label": "Directus地址", "key": "directus_host", "show": true }, { "label": "Directus令牌", "key": "directus_token", "show": false }] }
             ]
@@ -766,7 +766,7 @@
             const url = `/files`;
 
             const { data } = await axios.post(url,
-                 {
+                {
                     "size": 100,
                     "parent_id": "",
                     "next_page_token": page_token,
@@ -774,11 +774,11 @@
                     "additionalProp1": {}
                 },
                 {
-                headers: {
-                    'Authorization': setting.secret_token,
-                    'Content-Type': 'application/json'
-                },
-            })
+                    headers: {
+                        'Authorization': setting.secret_token,
+                        'Content-Type': 'application/json'
+                    },
+                })
             return data
         }
 
@@ -845,6 +845,7 @@
                                     </Navbar.Brand>
                                 </div>
                                 <div className="d-flex">
+                                    <Offline />
                                     <Tasks />
                                     <LocalTasks />
                                     <Button
@@ -992,101 +993,130 @@
 
         const Videos = () => {
             const [reload, setReload] = useState(false);
-            const [pageToken,setPageToken] = useState('');
+            const [pageToken, setPageToken] = useState('');
             const [keyword, setKeyword] = useState("")
             const [search, setSearch] = useState("")
             const [videos, setVideos] = useState([])
             const setting = STORE.getState().settings;
             const { id } = useParams();
             const columns = [
-				{ title: "文件名称", dataIndex: "name" },
-				{ title: "大小", dataIndex: "size", render: (row) => (bytesToSize(Number(row.size))) },
-				{ title: "日期", dataIndex: "created_time", render: (row) => (formatDate(row.created_time)) },
-				{
-					title: "操作",
-					dataIndex: "name",
-					render: (row) => (
+                { title: "文件名称", dataIndex: "name" },
+                { title: "大小", dataIndex: "size", render: (row) => (bytesToSize(Number(row.size))) },
+                { title: "日期", dataIndex: "created_time", render: (row) => (formatDate(row.created_time)) },
+                {
+                    title: "操作",
+                    dataIndex: "name",
+                    render: (row) => (
                         <div className="d-flex justify-content-center">
-						{
-                            row.kind=="drive#folder" ? (<Nav.Link
-							as={Link}
-							className="nav-link text-dark"
-							to={`/videos/${row.id}`}
-							target="_blank"
-						>
-							<Icon
-								icon="open-in-new"
-								size="6"
-								className="me-2"
-							/>
-						</Nav.Link>) :
-							(<Icon
-								icon="download-outline"
-								size="6"
-								className="me-2"
-								onClick={async () => {
-									let data = { "id": row.id }
-									await downloadMutation(data);
-								}}
-							/>)
-                        }
-
+                            {
+                                row.kind == "drive#folder" ? (<Nav.Link
+                                    as={Link}
+                                    className="nav-link text-dark"
+                                    to={`/videos/${row.id}`}
+                                    target="_blank"
+                                >
+                                    <Icon
+                                        icon="open-in-new"
+                                        size="6"
+                                        className="me-2"
+                                    />
+                                </Nav.Link>) :
+                                    (<Icon
+                                        icon="download-outline"
+                                        size="6"
+                                        className="me-2"
+                                        onClick={async () => {
+                                            let data = { "id": row.id }
+                                            await downloadMutation(data);
+                                        }}
+                                    />)
+                            }
 
                             <Icon
-								icon="share-variant"
-								size="6"
-								className="me-2"
-								onClick={async () => {
-									let data = { "id": row.id }
-									await sharedMutation(data);
-								}}
-							/>
+                                icon="delete"
+                                size="6"
+                                className="me-2"
+                                onClick={async () => {
+                                    let data = { "id": row.id }
+                                    await deleteMutation(data);
+                                }}
+                            />
+
+                            <Icon
+                                icon="share-variant"
+                                size="6"
+                                className="me-2"
+                                onClick={async () => {
+                                    let data = { "id": row.id }
+                                    await sharedMutation(data);
+                                }}
+                            />
                         </div>
-					),
-				},
-			];
-            const authorization = 'Bearer '+setting.secret_token;
+                    ),
+                },
+            ];
+            const authorization = 'Bearer ' + setting.secret_token;
             const { data: fileData, mutateAsync: downloadMutation } = useMutation({
-				mutationKey: ["get-download"],
-				mutationFn: async (fileinfo) => {
-					showLoading();
-					var url = '/files/'+fileinfo.id;
-					return await axios.get(url, {
-						headers: {
-							'Authorization': authorization,
-							'Content-Type': 'application/json'
-						},
-					})
-				},
-				onSuccess: async (data, variables, context) => {
-					hideLoading();
-				},
-				onError: () => {
-					hideLoading();
-				}
-			})
+                mutationKey: ["get-download"],
+                mutationFn: async (fileinfo) => {
+                    showLoading();
+                    var url = '/files/' + fileinfo.id;
+                    return await axios.get(url, {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
             const { data: shareData, mutateAsync: sharedMutation } = useMutation({
-				mutationKey: ["create_share"],
-				mutationFn: async (fileinfo) => {
-					showLoading();
-					var url = 'file_batch_share?need_password=false&expiration_days=-1';
-					return await axios.post(url,[fileinfo.id], {
-						headers: {
-							'Authorization': authorization,
-							'Content-Type': 'application/json'
-						},
-					})
-				},
-				onSuccess: async (data, variables, context) => {
-					hideLoading();
-				},
-				onError: () => {
-					hideLoading();
-				}
-			})
-            
-            const { data: linksData, mutateAsync: filesMutation,error:linksError,isPending:linksLoading } = useMutation({
-                mutationKey: ["get-files",pageToken],
+                mutationKey: ["create_share"],
+                mutationFn: async (fileinfo) => {
+                    showLoading();
+                    var url = '/file_batch_share?need_password=false&expiration_days=-1';
+                    return await axios.post(url, [fileinfo.id], {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+            const { data: deleteData, mutateAsync: deleteMutation } = useMutation({
+                mutationKey: ["delete_file"],
+                mutationFn: async (fileinfo) => {
+                    showLoading();
+                    var url = '/files/' + fileinfo.id;
+                    return await axios.delete(url, {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                    forceUpdate();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            const { data: linksData, mutateAsync: filesMutation, error: linksError, isPending: linksLoading } = useMutation({
+                mutationKey: ["get-files", pageToken],
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/files';
@@ -1109,9 +1139,9 @@
             }, [pageToken, reload, search]);
             useEffect(() => {
                 if (!setting.secret_token || setting.secret_token.length < 5) {
-					layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
-					return
-				}
+                    layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
+                    return
+                }
 
                 let data = {
                     "size": 100,
@@ -1120,7 +1150,7 @@
                     "additional_filters": {},
                     "additionalProp1": {}
                 }
-                
+
                 filesMutation(data);
             }, []);
             useEffect(() => {
@@ -1132,19 +1162,23 @@
 
 
             useEffect(() => {
-				if (fileData) {
-					emitEvent("addDownload", fileData)
-				}
-			}, [fileData]);
+                if (fileData) {
+                    emitEvent("addDownload", fileData)
+                }
+            }, [fileData]);
 
             useEffect(() => {
-				if (shareData) {
-					layer.alert(shareData.data.share_url);
-				}
-			}, [shareData]);
+                if (deleteData) {
+                    layer.msg("删除完成，请刷新查看结果");
+                }
+            }, [deleteData]);
 
+            useEffect(() => {
+                if (shareData) {
+                    layer.alert(shareData.data.share_url);
+                }
+            }, [shareData]);
 
-        
             const handleSearchClick = () => {
                 setSearch(keyword)
             };
@@ -1217,55 +1251,55 @@
 
         const Shares = () => {
             const [reload, setReload] = useState(false);
-            const [pageToken,setPageToken] = useState('');
+            const [pageToken, setPageToken] = useState('');
             const [keyword, setKeyword] = useState("")
             const [search, setSearch] = useState("")
             const [videos, setVideos] = useState([])
             const setting = STORE.getState().settings;
             const { id } = useParams();
             const columns = [
-				{ title: "文件名称", dataIndex: "title" },
-				{ title: "分享ID", dataIndex: "share_id"},
-				{ title: "日期", dataIndex: "create_time", render: (row) => (formatDate(row.create_time)) },
-				{
-					title: "操作",
-					dataIndex: "name",
-					render: (row) => (
-							<Icon
-								icon="cancel"
-								size="6"
-								className="me-2"
-								onClick={async () => {
-									let data = { "id": row.share_id }
-									await deleteMutation(data);
-								}}
-							/>
-					),
-				},
-			];
-            const authorization = 'Bearer '+setting.secret_token;
+                { title: "文件名称", dataIndex: "title" },
+                { title: "分享ID", dataIndex: "share_id" },
+                { title: "日期", dataIndex: "create_time", render: (row) => (formatDate(row.create_time)) },
+                {
+                    title: "操作",
+                    dataIndex: "name",
+                    render: (row) => (
+                        <Icon
+                            icon="cancel"
+                            size="6"
+                            className="me-2"
+                            onClick={async () => {
+                                let data = { "id": row.share_id }
+                                await deleteMutation(data);
+                            }}
+                        />
+                    ),
+                },
+            ];
+            const authorization = 'Bearer ' + setting.secret_token;
             const { data: fileData, mutateAsync: deleteMutation } = useMutation({
-				mutationKey: ["share_batch_delete"],
-				mutationFn: async (fileinfo) => {
-					showLoading();
-					var url = '/share_batch_delete';
-					return await axios.post(url, [fileinfo.id],{
-						headers: {
-							'Authorization': authorization,
-							'Content-Type': 'application/json'
-						},
-					})
-				},
-				onSuccess: async (data, variables, context) => {
-					hideLoading();
+                mutationKey: ["share_batch_delete"],
+                mutationFn: async (fileinfo) => {
+                    showLoading();
+                    var url = '/share_batch_delete';
+                    return await axios.post(url, [fileinfo.id], {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
                     forceUpdate();
-				},
-				onError: () => {
-					hideLoading();
-				}
-			})
-            const { data: linksData, mutateAsync: filesMutation,error:linksError,isPending:linksLoading } = useMutation({
-                mutationKey: ["get_share_list",pageToken],
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+            const { data: linksData, mutateAsync: filesMutation, error: linksError, isPending: linksLoading } = useMutation({
+                mutationKey: ["get_share_list", pageToken],
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/get_share_list';
@@ -1289,9 +1323,9 @@
             // }, [pageToken, reload]);
             useEffect(() => {
                 if (!setting.secret_token || setting.secret_token.length < 5) {
-					layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
-					return
-				}
+                    layer.alert("请先正确配置登陆令牌，最少5位", { icon: 5 });
+                    return
+                }
 
                 let data = {
                     "size": 100,
@@ -1300,7 +1334,7 @@
                     "additional_filters": {},
                     "additionalProp1": {}
                 }
-                
+
                 filesMutation(data);
             }, [pageToken, reload]);
             useEffect(() => {
@@ -1310,8 +1344,6 @@
                 }
             }, [linksData]);
 
-
-     
 
             const forceUpdate = () => {
                 setReload((pre) => !pre);
@@ -1366,7 +1398,138 @@
             );
         };
 
-       
+        const Offline = () => {
+            const [selectedOption, setSelectedOption] = useState(1);
+            const handleOptionChange = (event) => {
+                setSelectedOption(event.target.value);
+            };
+
+            const [linkValue, setLinkValue] = useState('');
+            const handleLinkChange = (event) => {
+                setLinkValue(event.target.value);
+            };
+
+            const [show, setShow] = useState(false);
+            const handleClose = () => setShow(false);
+            const handleShow = () => setShow(true);
+            const setting = STORE.getState().settings;
+            const authorization = 'Bearer ' + setting.secret_token;
+
+            const { data: taskData, mutateAsync: offlineMutation, error: taskError, isPending: taskLoading } = useMutation({
+                mutationKey: ["offfline-files"],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = query.url;
+                    return await axios.post(url, query.data, {
+                        headers: {
+                            'Authorization': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            useEffect(() => {
+                if (taskData) {
+                    layer.msg("添加完成，刷新查看");
+                }
+            }, [taskData]);
+
+
+            return (
+                <div>
+                    <Button
+                        style={{
+                            backgroundColor: "transparent",
+                        }}
+                        className="nav-link btn mr-1"
+                        onClick={handleShow}
+                        children={
+                            <span>
+                                <Icon
+                                    icon="plus"
+                                    size="3"
+                                    className="text-white"
+                                />
+                            </span>
+                        }
+                    ></Button>
+                    <Modal show={show} onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>添加离线</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form>
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                    <Form.Label>链接类型</Form.Label>
+                                    <div>
+                                        <Form.Check
+                                            inline
+                                            label="磁力"
+                                            name="offline_type"
+                                            type="radio"
+                                            value={1}
+                                            checked={selectedOption == 1}
+                                            onChange={handleOptionChange}
+                                        />
+                                        <Form.Check
+                                            inline
+                                            label="分享"
+                                            name="offline_type"
+                                            type="radio"
+                                            value={2}
+                                            checked={selectedOption == 2}
+                                            onChange={handleOptionChange}
+                                        />
+                                    </div>
+                                </Form.Group>
+                                <Form.Group
+                                    className="mb-3"
+                                    controlId="exampleForm.ControlTextarea1"
+                                >
+                                    <Form.Label>链接地址</Form.Label>
+                                    <Form.Control as="textarea" value={linkValue}
+                                        onChange={handleLinkChange} rows={3} />
+                                </Form.Group>
+                            </Form>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                关闭
+                            </Button>
+                            <Button variant="primary" onClick={async () => {
+                                var data = {};
+                                if (selectedOption == 1) {
+                                    data = {
+                                        url: "/offline",
+                                        data: {
+                                            "file_url": linkValue,
+                                            "parent_id": "",
+                                            "name": "",
+                                            "additionalProp1": {}
+                                        }
+                                    }
+                                } else {
+                                    data = {
+                                        url: "/restore?share_id=" + linkValue,
+                                        data: []
+                                    }
+                                }
+                                await offlineMutation(data);
+                            }}>
+                                保存
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
+            );
+        }
         const Tasks = () => {
             const [show, setShow] = useState(false);
             const handleClose = () => setShow(false);
@@ -1616,12 +1779,12 @@
                 const file = fileinfo.data;
                 var url = file.web_content_link;
                 for (const obj of file.medias) {
-                    if (obj.link.url.trim().length>10) { 
+                    if (obj.link.url.trim().length > 10) {
                         url = obj.link.url;
-                        break;     
+                        break;
                     }
                 }
-                const download = { name: file.name, size: Number(file.size),url:url, created: file.created_time }
+                const download = { name: file.name, size: Number(file.size), url: url, created: file.created_time }
                 setAddDownloadObject(download)
             }
             useEffect(() => {
