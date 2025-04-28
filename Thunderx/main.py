@@ -167,6 +167,12 @@ async def get_file_info(file_id: str):
     return await THUNDERX_CLIENT.get_download_url(file_id)
 
 
+@api_router.delete(
+    "/files/{file_id}", summary="删除文件", description="删除文件", tags=["文件"]
+)
+async def delete_file_info(file_id: str):
+    return await THUNDERX_CLIENT.delete_forever([file_id])
+
 @api_router.post(
     "/emptytrash", summary="清空回收站", description="清空回收站【慎用】", tags=["文件"]
 )
