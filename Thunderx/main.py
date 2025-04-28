@@ -13,7 +13,9 @@ from fastapi import (
     APIRouter,
     Depends,
     Request,
+    Query,
     Body,
+    Path,
     Response,
     HTTPException,
     status,
@@ -160,18 +162,100 @@ async def get_files(item: FileRequest):
     )
 
 
+@api_router.post("/file_star_list", summary="加星文件列表", description="加星文件列表", tags=["文件"])
+async def file_star_list( size: int = Query(default=100, title="显示数量", description="显示数量"), next_page_token: str | None = Query(default=None, title="分页Token", description="分页Token")):
+    return await THUNDERX_CLIENT.file_star_list(
+        size,next_page_token
+    )
+
 @api_router.get(
     "/files/{file_id}", summary="文件信息", description="获取文件信息", tags=["文件"]
 )
-async def get_file_info(file_id: str):
+async def get_file_info(file_id: str = Path(..., title="文件ID", description="文件ID") ):
     return await THUNDERX_CLIENT.get_download_url(file_id)
 
 
 @api_router.delete(
     "/files/{file_id}", summary="删除文件", description="删除文件", tags=["文件"]
 )
-async def delete_file_info(file_id: str):
+async def delete_file_info(file_id: str = Path(..., title="文件ID", description="文件ID") ):
     return await THUNDERX_CLIENT.delete_forever([file_id])
+
+@api_router.post(
+    "/file_rename", summary="重命名文件", description="重命名文件", tags=["文件"]
+)
+async def file_rename(
+    file_id: str = Query(title="文件ID", description="文件ID"),
+    new_file_name: str = Query(title="新文件名", description="新文件名"),
+    ):
+    return await THUNDERX_CLIENT.file_rename(file_id,new_file_name)
+
+
+@api_router.post(
+    "/file_batch_copy", summary="批量复制文件", description="批量复制文件", tags=["文件"]
+)
+async def file_batch_copy(
+    ids: List[str] = Body(title="文件ID列表", description="文件ID列表"),
+    to_parent_id: str = Query(title="复制到的文件夹id, 默认为根目录", description="复制到的文件夹id, 默认为根目录"),
+    ):
+    return await THUNDERX_CLIENT.file_batch_copy(ids,to_parent_id)
+
+
+@api_router.post(
+    "/file_batch_move", summary="批量移动文件", description="批量移动文件", tags=["文件"]
+)
+async def file_batch_move(
+    ids: List[str] = Body(title="文件ID列表", description="文件ID列表"),
+    to_parent_id: str = Query(title="移动到的文件夹id, 默认为根目录", description="移动到的文件夹id, 默认为根目录"),
+    ):
+    return await THUNDERX_CLIENT.file_batch_move(ids,to_parent_id)
+
+
+@api_router.post(
+    "/create_folder", summary="新建文件夹", description="新建文件夹", tags=["文件"]
+)
+async def create_folder(
+    name: str = Query(title="文件夹名称", description="文件夹名称"),
+    parent_id: str = Query(title="父文件夹id, 默认创建到根目录", description="父文件夹id, 默认创建到根目录"),
+    ):
+    return await THUNDERX_CLIENT.create_folder(name,parent_id)
+
+
+@api_router.post(
+    "/delete_to_trash", summary="将文件夹、文件移动到回收站", description="将文件夹、文件移动到回收站", tags=["文件"]
+)
+async def delete_to_trash(ids: List[str] = Body(title="文件ID列表", description="文件ID列表") ):
+    return await THUNDERX_CLIENT.delete_to_trash(ids)
+
+
+@api_router.post(
+    "/delete_forever", summary="将文件夹、文件彻底删除", description="将文件夹、文件彻底删除", tags=["文件"]
+)
+async def delete_forever(ids: List[str] = Body(title="文件ID列表", description="文件ID列表") ):
+    return await THUNDERX_CLIENT.delete_forever(ids)
+
+
+@api_router.post(
+    "/untrash", summary="将文件夹、文件移出回收站", description="将文件夹、文件移出回收站", tags=["文件"]
+)
+async def untrash(ids: List[str] = Body(title="文件ID列表", description="文件ID列表") ):
+    return await THUNDERX_CLIENT.untrash(ids)
+
+
+@api_router.post(
+    "/file_batch_star", summary="批量给文件加星标", description="批量给文件加星标", tags=["文件"]
+)
+async def file_batch_star(ids: List[str] = Body(title="文件ID列表", description="文件ID列表") ):
+    return await THUNDERX_CLIENT.file_batch_star(ids)
+
+
+@api_router.post(
+    "/file_batch_unstar", summary="批量给文件加星标", description="批量给文件加星标", tags=["文件"]
+)
+async def file_batch_unstar(ids: List[str] = Body(title="文件ID列表", description="文件ID列表") ):
+    return await THUNDERX_CLIENT.file_batch_unstar(ids)
+
+
 
 @api_router.post(
     "/emptytrash", summary="清空回收站", description="清空回收站【慎用】", tags=["文件"]
@@ -184,27 +268,34 @@ async def emptytrash():
 @api_router.post(
     "/get_share_list", summary="获取账号分享列表", description="获取账号分享列表", tags=["分享"]
 )
-async def get_share_list(page_token: str | None = None):
+async def get_share_list(page_token: str | None = Query(default=None, title="分页Token", description="分页Token") ):
     return await THUNDERX_CLIENT.get_share_list(page_token)
 
 
 @api_router.post(
     "/file_batch_share", summary="创建分享", description="创建分享", tags=["分享"]
 )
-async def file_batch_share(ids: List[str] = None, need_password: bool | None = False,expiration_days:int | None=-1):
+async def file_batch_share(
+    ids: List[str] = Body(default=None, title="文件ID列表", description="文件ID列表"),
+    need_password: bool | None = Query(default=False, title="是否需要密码", description="是否需要密码"), 
+    expiration_days:int | None = Query(default=-1, title="过期时间", description="过期时间【天数，默认永远】"), 
+    ):
     return await THUNDERX_CLIENT.file_batch_share(ids,need_password,expiration_days)
 
 
 @api_router.post(
     "/share_batch_delete", summary="取消分享", description="取消分享", tags=["分享"]
 )
-async def share_batch_delete(ids: List[str]):
+async def share_batch_delete(ids: List[str] = Body(title="文件ID列表", description="文件ID列表")):
     return await THUNDERX_CLIENT.share_batch_delete(ids)
 
 @api_router.post(
     "/get_share_folder", summary="获取分享信息", description="获取分享信息", tags=["分享"]
 )
-async def get_share_folder(share_id: str, pass_code_token: str | None = None,parent_id:str | None=None):
+async def get_share_folder(
+    share_id: str = Query(title="分享ID", description="分享ID"), 
+    pass_code_token: str | None = Query(default=None,title="密码", description="密码"),
+    parent_id:str | None=Query(default=None,title="父ID", description="父ID")):
     return await THUNDERX_CLIENT.get_share_folder(share_id,pass_code_token,parent_id)
 
 
