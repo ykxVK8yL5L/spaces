@@ -11,6 +11,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     CallbackContext,
     ContextTypes,
+    filters,
 )
 import httpx
 
@@ -149,6 +150,7 @@ TG_BASE_URL = "https://tg.alist.dpdns.org/bot"
 
 
 ###################TG机器人功能区###################
+# ❗❗❗❗❗❗❗❗❗注意TG机器人callbackdata不能超过64位，否则会报无效按钮的错误 
 # 定义命令处理函数
 async def start(update: Update, context):
     commands = (
@@ -216,6 +218,184 @@ async def tg_emptytrash(update: Update, context):
         await update.message.reply_text(f"✅操作成功")
 
 
+# 消息处理
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+    if text.lower().startswith("magnet:"):
+        result = await THUNDERX_CLIENT.offline_download(text, "", "")
+        if result["task"]["id"] is not None:
+            await update.message.reply_text(f"✅操作成功")
+        else:
+            await update.message.reply_text(f"❌未成功创建任务，请稍后重试!!")
+    else:
+        await update.message.reply_text(f"收到不支持的消息:{text}")
+
+
+#################### 文件操作 #############################
+
+
+async def tg_show_files(update: Update, context: CallbackContext):
+    files = await THUNDERX_CLIENT.file_list(100, "", "", {})
+    keyboard = []
+
+    if files["files"] is None:
+        await update.message.reply_text("❌未找到文件!!")
+    else:
+        # 为每个文件创建按钮和操作选项
+        for file in files["files"]:
+            if file["kind"].lower() == "drive#folder":
+                keyboard.append(
+                    [
+                        InlineKeyboardButton(
+                            f"查看📁: {file['name']}",
+                            callback_data=f"ls_f:{file['id']}:{file['parent_id']}",
+                        ),
+                        InlineKeyboardButton(
+                            f"删除",
+                            callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                        ),
+                    ]
+                )
+            else:
+                keyboard.append(
+                    [
+                        InlineKeyboardButton(
+                            f"下载📄: {file['name']}",
+                            callback_data=f"dw_f:{file['id']}:{file['parent_id']}",
+                        ),
+                        InlineKeyboardButton(
+                            f"删除",
+                            callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                        ),
+                    ]
+                )
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(f"📋文件列表:", reply_markup=reply_markup)
+
+
+async def handle_file_confirmation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取确认操作的类型和文件 ID
+    action, file_id = (query.data.split(":")[0], query.data.split(":")[1])
+
+    if action == "yes_f_del_f":
+        await THUNDERX_CLIENT.delete_forever([file_id])
+        await query.edit_message_text(f"✅文件 {file_id} 已删除。")
+
+
+async def handle_file_cancel(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    # 获取取消操作的类型和文件 ID
+    # action, file_id, parent_id = (
+    #     query.data.split(":")[0],
+    #     query.data.split(":")[1],
+    #     query.data.split(":")[2],
+    # )
+    # 返回文件夹列表
+    await query.edit_message_text(f"操作已取消")
+
+
+# 处理任务操作的回调
+async def handle_file_operation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取操作类型和文件 ID
+    action, file_id, parent_id = (
+        query.data.split(":")[0],
+        query.data.split(":")[1],
+        query.data.split(":")[2],
+    )
+
+    # 需要确认的操作
+    if action in ["del_f"]:
+        # 生成确认消息
+        keyboard = [
+            [InlineKeyboardButton("确认", callback_data=f"yes_f_{action}:{file_id}")],
+            [InlineKeyboardButton("取消", callback_data=f"no_f_{action}:{file_id}")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            f"你确定要{action}文件 {file_id} 吗？", reply_markup=reply_markup
+        )
+    else:
+        # 不需要确认的操作，直接处理
+        await perform_file_action(update, context, action, file_id, parent_id)
+
+
+async def perform_file_action(
+    update: Update, context: CallbackContext, action: str, file_id: str, parent_id: str
+):
+
+    if action == "ls_f":
+        files = await THUNDERX_CLIENT.file_list(100, file_id, "", {})
+        keyboard = []
+
+        if files["files"] is None:
+            await update.message.reply_text("❌未找到文件!!")
+        else:
+            keyboard.append(
+                [
+                    InlineKeyboardButton(
+                        f"↩️返回上级",
+                        callback_data=f"ls_f:{parent_id}:{parent_id}",
+                    ),
+                ]
+            )
+            # 为每个文件创建按钮和操作选项
+            for file in files["files"]:
+                if file["kind"].lower() == "drive#folder":
+                    keyboard.append(
+                        [
+                            InlineKeyboardButton(
+                                f"查看📁: {file['name']}",
+                                callback_data=f"ls_f:{file['id']}:{file['parent_id']}",
+                            ),
+                            InlineKeyboardButton(
+                                f"删除",
+                                callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                            ),
+                        ]
+                    )
+                else:
+                    keyboard.append(
+                        [
+                            InlineKeyboardButton(
+                                f"下载📄: {file['name']}",
+                                callback_data=f"dw_f:{file['id']}:{file['parent_id']}",
+                            ),
+                            InlineKeyboardButton(
+                                f"删除",
+                                callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                            ),
+                        ]
+                    )
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            # await update.message.reply_text(f"📋文件列表:", reply_markup=reply_markup)
+            await update.callback_query.edit_message_text(
+                f"📋文件列表:", reply_markup=reply_markup
+            )
+    elif action == "dw_f":
+        result = await THUNDERX_CLIENT.get_download_url(file_id)
+        download_url = result["web_content_link"]
+        for media in result["medias"]:
+            if media["link"]["url"] is not None:
+                download_url = media["link"]["url"]
+                break
+        if download_url is not None:
+            await update.callback_query.edit_message_text(
+                f"📋文件下载地址:{download_url}"
+            )
+        else:
+            await update.callback_query.edit_message_text(f"❌未找到文件下载地址!!")
+
+
+#################### 离线任务处理 ##########################
 # 确认操作的回调
 async def handle_task_confirmation(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -409,11 +589,30 @@ async def init_client():
         TG_BOT_APPLICATION.add_handler(
             CallbackQueryHandler(handle_task_confirmation, pattern="^confirm_task")
         )
+
+        ########## 文件操作 ###############
+
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_file_operation, pattern="^(del_f|ls_f|dw_f):")
+        )
+        # 处理取消任务操作
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_file_cancel, pattern="^no_f")
+        )
+        # 处理确认操作（确认删除、复制等）
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_file_confirmation, pattern="^yes_f")
+        )
+
         TG_BOT_APPLICATION.add_handler(CommandHandler("start", start))
         TG_BOT_APPLICATION.add_handler(CommandHandler("help", help))
         TG_BOT_APPLICATION.add_handler(CommandHandler("quota", quota))
         TG_BOT_APPLICATION.add_handler(CommandHandler("emptytrash", tg_emptytrash))
         TG_BOT_APPLICATION.add_handler(CommandHandler("tasks", tg_show_task))
+        TG_BOT_APPLICATION.add_handler(CommandHandler("files", tg_show_files))
+        # Message 消息处理相关的命令！
+        TG_BOT_APPLICATION.add_handler(MessageHandler(filters.TEXT, handle_message))
+
         await TG_BOT_APPLICATION.initialize()
 
 
