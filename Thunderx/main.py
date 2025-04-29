@@ -150,7 +150,7 @@ TG_BASE_URL = "https://tg.alist.dpdns.org/bot"
 
 
 ###################TG机器人功能区###################
-# ❗❗❗❗❗❗❗❗❗注意TG机器人callbackdata不能超过64位，否则会报无效按钮的错误 
+# ❗❗❗❗❗❗❗❗❗注意TG机器人callbackdata不能超过64位，否则会报无效按钮的错误
 # 定义命令处理函数
 async def start(update: Update, context):
     commands = (
@@ -159,6 +159,7 @@ async def start(update: Update, context):
         "•直接发送magent:开的关磁力将直接离线下载\n"
         "•/tasks - 查看下载任务\n"
         "•/files - 查看文件列表\n"
+        "•/shares - 查看分享列表\n"
         "•/quota - 查看存储空间\n"
         "•/emptytrash - 清空回收站\n"
         "•/help - 获取帮助信息\n"
@@ -173,6 +174,7 @@ async def help(update: Update, context):
         "•直接发送magent:开的关磁力将直接离线下载\n"
         "•/tasks - 查看下载任务\n"
         "•/files - 查看文件列表\n"
+        "•/shares - 查看分享列表\n"
         "•/quota - 查看存储空间\n"
         "•/emptytrash - 清空回收站\n"
         "•/help - 获取帮助信息\n"
@@ -231,6 +233,85 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"收到不支持的消息:{text}")
 
 
+# 消息处理
+async def handle_copy_text(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取操作类型和文件 ID
+    action, text = (query.data.split(":")[0], query.data.split(":")[1])
+    await query.edit_message_text(f"{text}")
+
+
+#################### 分享操作 #############################
+async def tg_show_shares(update: Update, context: CallbackContext):
+    shares = await THUNDERX_CLIENT.get_share_list("")
+    keyboard = []
+
+    if shares["data"] is None:
+        await update.message.reply_text("❌未找到分享!!")
+    else:
+        # 为每个文件创建按钮和操作选项
+        for share in shares["data"]:
+            keyboard.append(
+                [
+                    InlineKeyboardButton(
+                        f"{share['title']}",
+                        callback_data=f"copy_text:{share['share_id']}",
+                    ),
+                    InlineKeyboardButton(
+                        f"{share['share_id']}",
+                        callback_data=f"copy_text:{share['share_id']}",
+                    ),
+                    InlineKeyboardButton(
+                        f"取消",
+                        callback_data=f"del_s:{share['share_id']}",
+                    ),
+                ]
+            )
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(f"📋分享列表:", reply_markup=reply_markup)
+
+
+# 处理任务操作的回调
+async def handle_share_operation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取操作类型和文件 ID
+    action, share_id = (query.data.split(":")[0], query.data.split(":")[1])
+
+    # 需要确认的操作
+    if action in ["del_s"]:
+        # 生成确认消息
+        keyboard = [
+            [InlineKeyboardButton("确认", callback_data=f"yes_s_{action}:{share_id}")],
+            [InlineKeyboardButton("取消", callback_data=f"no_s_{action}:{share_id}")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            f"你确定要{action}分享 {share_id} 吗？", reply_markup=reply_markup
+        )
+
+
+async def handle_share_confirmation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取确认操作的类型和文件 ID
+    action, share_id = (query.data.split(":")[0], query.data.split(":")[1])
+
+    if action == "yes_s_del_s":
+        await THUNDERX_CLIENT.share_batch_delete([share_id])
+        await query.edit_message_text(f"✅分享 {share_id} 已取消。")
+
+
+async def handle_share_cancel(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(f"操作已取消")
+
+
 #################### 文件操作 #############################
 
 
@@ -254,6 +335,10 @@ async def tg_show_files(update: Update, context: CallbackContext):
                             f"删除",
                             callback_data=f"del_f:{file['id']}:{file['parent_id']}",
                         ),
+                        InlineKeyboardButton(
+                            f"分享",
+                            callback_data=f"sh_f:{file['id']}:{file['parent_id']}",
+                        ),
                     ]
                 )
             else:
@@ -266,6 +351,10 @@ async def tg_show_files(update: Update, context: CallbackContext):
                         InlineKeyboardButton(
                             f"删除",
                             callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                        ),
+                        InlineKeyboardButton(
+                            f"分享",
+                            callback_data=f"sh_f:{file['id']}:{file['parent_id']}",
                         ),
                     ]
                 )
@@ -359,6 +448,10 @@ async def perform_file_action(
                                 f"删除",
                                 callback_data=f"del_f:{file['id']}:{file['parent_id']}",
                             ),
+                            InlineKeyboardButton(
+                                f"分享",
+                                callback_data=f"sh_f:{file['id']}:{file['parent_id']}",
+                            ),
                         ]
                     )
                 else:
@@ -371,6 +464,10 @@ async def perform_file_action(
                             InlineKeyboardButton(
                                 f"删除",
                                 callback_data=f"del_f:{file['id']}:{file['parent_id']}",
+                            ),
+                            InlineKeyboardButton(
+                                f"分享",
+                                callback_data=f"sh_f:{file['id']}:{file['parent_id']}",
                             ),
                         ]
                     )
@@ -393,6 +490,13 @@ async def perform_file_action(
             )
         else:
             await update.callback_query.edit_message_text(f"❌未找到文件下载地址!!")
+    elif action == "sh_f":
+        result = await THUNDERX_CLIENT.file_batch_share([file_id], False, -1)
+        share_id = result["share_id"]
+        if share_id is not None:
+            await update.callback_query.edit_message_text(f"✅分享码:{share_id}")
+        else:
+            await update.callback_query.edit_message_text(f"❌分享失败!!")
 
 
 #################### 离线任务处理 ##########################
@@ -590,10 +694,25 @@ async def init_client():
             CallbackQueryHandler(handle_task_confirmation, pattern="^confirm_task")
         )
 
+        ########## 分享操作 ###############
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_share_operation, pattern="^del_s:")
+        )
+        # 处理取消任务操作
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_share_cancel, pattern="^no_s")
+        )
+        # 处理确认操作（确认删除、复制等）
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_share_confirmation, pattern="^yes_s")
+        )
+
         ########## 文件操作 ###############
 
         TG_BOT_APPLICATION.add_handler(
-            CallbackQueryHandler(handle_file_operation, pattern="^(del_f|ls_f|dw_f):")
+            CallbackQueryHandler(
+                handle_file_operation, pattern="^(del_f|ls_f|dw_f|sh_f):"
+            )
         )
         # 处理取消任务操作
         TG_BOT_APPLICATION.add_handler(
@@ -610,9 +729,13 @@ async def init_client():
         TG_BOT_APPLICATION.add_handler(CommandHandler("emptytrash", tg_emptytrash))
         TG_BOT_APPLICATION.add_handler(CommandHandler("tasks", tg_show_task))
         TG_BOT_APPLICATION.add_handler(CommandHandler("files", tg_show_files))
+        TG_BOT_APPLICATION.add_handler(CommandHandler("shares", tg_show_shares))
         # Message 消息处理相关的命令！
         TG_BOT_APPLICATION.add_handler(MessageHandler(filters.TEXT, handle_message))
-
+        # 处理取消任务操作
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_copy_text, pattern="^copy_text")
+        )
         await TG_BOT_APPLICATION.initialize()
 
 
