@@ -2,8 +2,16 @@ import os
 import asyncio
 import json
 import logging
-from telegram import Bot, Update
-from telegram.ext import Application, CommandHandler, MessageHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    CallbackContext,
+    ContextTypes,
+)
 import httpx
 
 from pikpakapi import PikPakApi
@@ -208,6 +216,148 @@ async def tg_emptytrash(update: Update, context):
         await update.message.reply_text(f"✅操作成功")
 
 
+# 确认操作的回调
+async def handle_task_confirmation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取确认操作的类型和文件 ID
+    action, task_id = query.data.split(":")[0], query.data.split(":")[1]
+
+    if action == "confirm_task_delete_task":
+        await THUNDERX_CLIENT.delete_tasks([task_id])
+        await query.edit_message_text(f"✅任务 {task_id} 已删除。")
+
+
+async def handle_task_cancel(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    # 获取取消操作的类型和文件 ID
+    action, file_id = query.data.split(":")[0], query.data.split(":")[1]
+    # 返回文件夹列表
+    await query.edit_message_text(f"操作已取消")
+
+
+async def tg_show_task(update: Update, context: CallbackContext):
+    """
+    {
+      "tasks": [
+        {
+          "kind": "drive#task",
+          "id": "VONrJ4Skj4Qs7ALhxXlFudfJAA",
+          "name": "Billy Elliot (2000) 1080p (Deep61)[TGx]",
+          "type": "offline",
+          "user_id": "2000403406",
+          "statuses": [],
+          "status_size": 2,
+          "params": {
+            "folder_type": "",
+            "predict_type": "1",
+            "url": "magnet:?xt=urn:btih:96451E6F1ADBC8827B43621B74EDB30DF45012D6"
+          },
+          "file_id": "VONrJ4dZ8zf9KVWQuVEKmW8sTT",
+          "file_name": "Billy Elliot (2000) 1080p (Deep61)[TGx]",
+          "file_size": "3748030421",
+          "message": "Task timeout",
+          "created_time": "2025-04-15T10:38:54.320+08:00",
+          "updated_time": "2025-04-17T10:39:12.189+08:00",
+          "third_task_id": "",
+          "phase": "PHASE_TYPE_ERROR",
+          "progress": 0,
+          "icon_link": "https://backstage-img.xunleix.com/65d616355857aef8af40b89f187a8cf2770cb0ce",
+          "callback": "",
+          "reference_resource": {
+            "@type": "type.googleapis.com/drive.ReferenceFile",
+            "kind": "drive#folder",
+            "id": "VONrJ4dZ8zf9KVWQuVEKmW8sTT",
+            "parent_id": "VONS0fwXf3FNvt-g_IlMVKPxAA",
+            "name": "Billy Elliot (2000) 1080p (Deep61)[TGx]",
+            "size": "3748030421",
+            "mime_type": "",
+            "icon_link": "https://backstage-img.xunleix.com/65d616355857aef8af40b89f187a8cf2770cb0ce",
+            "hash": "",
+            "phase": "PHASE_TYPE_ERROR",
+            "audit": null,
+            "thumbnail_link": "",
+            "params": {},
+            "space": "",
+            "medias": [],
+            "starred": false,
+            "tags": []
+          },
+          "space": ""
+        }
+      ],
+      "next_page_token": "",
+      "expires_in": 60,
+      "expires_in_ms": 60000
+    }
+    """
+    tasks = await THUNDERX_CLIENT.offline_list(
+        size=100,
+        next_page_token=None,
+        phase=None,
+    )
+    keyboard = []
+
+    if tasks["tasks"] is None:
+        await update.message.reply_text("❌未找到任务!!")
+    else:
+        # 为每个文件创建按钮和操作选项
+        for task in tasks["tasks"]:
+            # 为每个文件添加操作按钮：删除
+            keyboard.append(
+                [
+                    InlineKeyboardButton(
+                        f"取消任务: {task['name']}",
+                        callback_data=f"delete_task:{task['id']}",
+                    ),
+                ]
+            )
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(f"📋任务列表:", reply_markup=reply_markup)
+
+
+# 处理任务操作的回调
+async def handle_tasks_operation(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+
+    # 获取操作类型和文件 ID
+    action, task_id = query.data.split(":")
+
+    # 需要确认的操作
+    if action in ["delete_task"]:
+        # 生成确认消息
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    "确认", callback_data=f"confirm_task_{action}:{task_id}"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "取消", callback_data=f"cancel_task_{action}:{task_id}"
+                )
+            ],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            f"你确定要{action}任务 {task_id} 吗？", reply_markup=reply_markup
+        )
+    else:
+        # 不需要确认的操作，直接处理
+        await perform_task_action(update, context, action, task_id)
+
+
+async def perform_task_action(
+    update: Update, context: CallbackContext, action: str, file_id: str
+):
+    if action == "cancel_task":
+        await update.callback_query.edit_message_text(f"你选择了取消任务：{file_id}")
+
+
 @app.on_event("startup")
 async def init_client():
     global THUNDERX_CLIENT
@@ -245,13 +395,26 @@ async def init_client():
             Application.builder().base_url(TG_BASE_URL).token(TG_BOT_TOKEN).build()
         )
         # await TG_BOT_APPLICATION.bot.delete_webhook()
-        await TG_BOT_APPLICATION.bot.set_webhook(TG_WEBHOOK_URL)
-        await TG_BOT_APPLICATION.initialize()
-        # 将命令处理函数添加到 dispatcher
+        await TG_BOT_APPLICATION.bot.set_webhook(
+            url=TG_WEBHOOK_URL, allowed_updates=Update.ALL_TYPES
+        )
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_tasks_operation, pattern="^delete_task:")
+        )
+        # 处理取消任务操作
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_task_cancel, pattern="^cancel_task")
+        )
+        # 处理确认操作（确认删除、复制等）
+        TG_BOT_APPLICATION.add_handler(
+            CallbackQueryHandler(handle_task_confirmation, pattern="^confirm_task")
+        )
         TG_BOT_APPLICATION.add_handler(CommandHandler("start", start))
         TG_BOT_APPLICATION.add_handler(CommandHandler("help", help))
         TG_BOT_APPLICATION.add_handler(CommandHandler("quota", quota))
         TG_BOT_APPLICATION.add_handler(CommandHandler("emptytrash", tg_emptytrash))
+        TG_BOT_APPLICATION.add_handler(CommandHandler("tasks", tg_show_task))
+        await TG_BOT_APPLICATION.initialize()
 
 
 # FastAPI 路由：接收来自 Telegram 的 Webhook 回调
