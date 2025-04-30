@@ -157,6 +157,7 @@ async def start(update: Update, context):
         "🚀欢迎使用我的机器人！\n\n"
         "📋可用命令:\n"
         "•直接发送magent:开头的磁力将直接离线下载\n"
+        "•直接发送share:开头的分享ID将直接离线下载\n"
         "•/tasks - 查看下载任务\n"
         "•/files - 查看文件列表\n"
         "•/shares - 查看分享列表\n"
@@ -172,6 +173,7 @@ async def help(update: Update, context):
         "🚀欢迎使用我的机器人！\n\n"
         "📋可用命令:\n"
         "•直接发送magent:开头的磁力将直接离线下载\n"
+        "•直接发送share:开头的分享ID将直接离线下载\n"
         "•/tasks - 查看下载任务\n"
         "•/files - 查看文件列表\n"
         "•/shares - 查看分享列表\n"
@@ -226,6 +228,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text.lower().startswith("magnet:"):
         result = await THUNDERX_CLIENT.offline_download(text, "", "")
         if result["task"]["id"] is not None:
+            await update.message.reply_text(f"✅操作成功")
+        else:
+            await update.message.reply_text(f"❌未成功创建任务，请稍后重试!!")
+    elif text.lower().startswith("share:"):
+        share_id = text.split(":")[1]
+        result = await THUNDERX_CLIENT.restore(share_id, None, None)
+        if result is not None:
             await update.message.reply_text(f"✅操作成功")
         else:
             await update.message.reply_text(f"❌未成功创建任务，请稍后重试!!")
