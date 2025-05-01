@@ -1,4 +1,6 @@
-FROM python:3.13.3-slim-bullseye
+FROM node:22-slim as nodebuilder
+
+FROM python:3.13-slim-bullseye
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,8 +23,12 @@ ARG N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY
 ARG RCLONE_CONF=$RCLONE_CONF
 
 
+COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
+COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
+
 # Install necessary packages
-RUN apt-get update && \
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    apt-get update && \
     apt-get install -y \
     curl \
     sudo \
@@ -48,15 +54,12 @@ RUN apt-get update && \
     procps \
     netcat \
     sshpass \
+    rclone \ 
     unzip \
-    rclone \
-    nodejs \
-    npm \
     git \
     make \
     chromium \
     libatomic1 
-
 
 RUN npm install -g pnpm pm2 ts-node n8n@1.88.0
 
