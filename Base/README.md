@@ -21,7 +21,7 @@ Space variables (Public)说明:
 GENERIC_TIMEZONE=Asia/Shanghai  :时区   
 TZ=Asia/Shanghai   :时区     
 N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true   :重置文件权限   
-WEBHOOK_URL=https://用户名-space名.hf.space     
+WEBHOOK_URL=https://用户名-space名.hf.space/    !!!!!不要漏了最后的反斜杠     
 
 Space secrets(Private)说明:   
 N8N_ENCRYPTION_KEY:  加密密钥【需要保存，如不保存以后重置数据无法恢复】   
