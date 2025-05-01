@@ -1,3 +1,5 @@
+# 在huggingface上部署Alist会秒封号 请勿使用！！！
+
 ---
 title: Alist
 emoji: ⚡
