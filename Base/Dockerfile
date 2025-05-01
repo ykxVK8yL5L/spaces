@@ -26,7 +26,7 @@ ARG RCLONE_CONF=$RCLONE_CONF
 
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
-COPY --from=rclone /usr/bin/rclone /usr/bin/rclone
+COPY --from=rclone /usr/local/bin/rclone /usr/bin/rclone
 
 # Install necessary packages
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
