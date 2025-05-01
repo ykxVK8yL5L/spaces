@@ -1,4 +1,5 @@
 FROM node:22-slim as nodebuilder
+FROM rclone/rclone:latest AS rclone
 
 FROM python:3.13-slim-bullseye
 
@@ -25,6 +26,7 @@ ARG RCLONE_CONF=$RCLONE_CONF
 
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
+COPY --from=rclone /usr/bin/rclone /usr/bin/rclone
 
 # Install necessary packages
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
@@ -59,7 +61,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     make \
     chromium \
     libatomic1 
-RUN curl -s https://rclone.org/install.sh | bash
+
 RUN npm install -g pnpm pm2 ts-node n8n@1.88.0
 
 RUN chmod -R 777 /var && \
