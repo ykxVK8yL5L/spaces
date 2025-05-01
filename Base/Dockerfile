@@ -60,7 +60,7 @@ RUN sudo -v ; curl https://rclone.org/install.sh | sudo bash
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
     apt-get install -y nodejs
 
-RUN npm install -g pnpm@8.3.1 pm2 ts-node n8n@1.88.0
+RUN npm install -g pnpm pm2 ts-node n8n
 
 RUN chmod -R 777 /var && \
     chmod -R 777 /usr/local && \
