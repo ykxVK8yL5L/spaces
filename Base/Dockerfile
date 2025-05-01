@@ -49,18 +49,16 @@ RUN apt-get update && \
     netcat \
     sshpass \
     unzip \
+    rclone \
+    nodejs \
+    npm \
     git \
     make \
     chromium \
     libatomic1 
 
-RUN sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
-# Install Node.js (LTS version)
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
-    apt-get install -y nodejs
-
-RUN npm install -g pnpm pm2 ts-node n8n
+RUN npm install -g pnpm pm2 ts-node n8n@1.88.0
 
 RUN chmod -R 777 /var && \
     chmod -R 777 /usr/local && \
@@ -102,7 +100,7 @@ RUN chown -R coder:coder /home/coder/.local/share/code-server
 USER coder
 
 ENV HOME=/home/coder \
-	PATH=/home/coder/.local/bin:$PATH
+    PATH=/home/coder/.local/bin:$PATH
 
 COPY --chown=coder start_server.sh $HOME
 COPY --chown=coder apps.conf $HOME
