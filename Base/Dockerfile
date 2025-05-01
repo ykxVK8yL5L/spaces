@@ -54,13 +54,12 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     procps \
     netcat \
     sshpass \
-    rclone \ 
     unzip \
     git \
     make \
     chromium \
     libatomic1 
-
+RUN curl -s https://rclone.org/install.sh | bash
 RUN npm install -g pnpm pm2 ts-node n8n@1.88.0
 
 RUN chmod -R 777 /var && \
