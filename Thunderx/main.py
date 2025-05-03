@@ -271,7 +271,7 @@ async def tg_show_shares(update: Update, context: CallbackContext):
                     ),
                     InlineKeyboardButton(
                         f"{share['share_id']}",
-                        callback_data=f"copy_text:{share['share_id']}",
+                        callback_data=f"copy_text:分享码:{share['share_id']}",
                     ),
                     InlineKeyboardButton(
                         f"取消",
