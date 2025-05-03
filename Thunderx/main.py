@@ -496,7 +496,7 @@ async def perform_file_action(
                 break
         if download_url is not None:
             await update.callback_query.edit_message_text(
-                f"📋文件下载地址:{download_url}"
+                f"{download_url}"
             )
         else:
             await update.callback_query.edit_message_text(f"❌未找到文件下载地址!!")
