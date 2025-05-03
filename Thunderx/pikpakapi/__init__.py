@@ -1113,6 +1113,9 @@ class PikPakApi:
             "share_id": share_id,
             "pass_code_token": pass_code_token,
             "file_ids": file_ids,
+            "folder_type": "NORMAL",
+            "specify_parent_id" : True,
+            "parent_id" : "",
         }
         captcha_result = await self.captcha_init(f"GET:/drive/v1/share/restore")
         self.captcha_token = captcha_result.get("captcha_token")
