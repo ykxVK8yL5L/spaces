@@ -237,7 +237,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if isinstance(result, str):
             await update.message.reply_text(f"❌未成功创建任务:{result}，请稍后重试!!")
         else:
-            await update.message.reply_text(f"操作结果:{result['share_status_text']}")
+            await update.message.reply_text(f"操作结果:{result['restore_status']}")
 
     else:
         await update.message.reply_text(f"收到不支持的消息:{text}")
