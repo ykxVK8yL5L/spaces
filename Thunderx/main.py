@@ -249,7 +249,7 @@ async def handle_copy_text(update: Update, context: CallbackContext):
     await query.answer()
 
     # 获取操作类型和文件 ID
-    action, text = (query.data.split(":")[0], query.data.split(":")[1])
+    action, text = (query.data.split(":")[0], query.data.split(":",1)[1])
     await query.edit_message_text(f"{text}")
 
 
