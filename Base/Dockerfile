@@ -62,7 +62,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     chromium \
     libatomic1 
 
-RUN npm install -g pnpm pm2 ts-node n8n@1.88.0
+RUN npm install -g pnpm pm2 n8n
 
 RUN chmod -R 777 /var && \
     chmod -R 777 /usr/local && \
