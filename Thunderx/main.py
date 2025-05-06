@@ -249,7 +249,7 @@ async def handle_copy_text(update: Update, context: CallbackContext):
     await query.answer()
 
     # 获取操作类型和文件 ID
-    action, text = (query.data.split(":")[0], query.data.split(":",1)[1])
+    action, text = (query.data.split(":")[0], query.data.split(":", 1)[1])
     await query.edit_message_text(f"{text}")
 
 
@@ -495,9 +495,7 @@ async def perform_file_action(
                 download_url = media["link"]["url"]
                 break
         if download_url is not None:
-            await update.callback_query.edit_message_text(
-                f"{download_url}"
-            )
+            await update.callback_query.edit_message_text(f"{download_url}")
         else:
             await update.callback_query.edit_message_text(f"❌未找到文件下载地址!!")
     elif action == "sh_f":
@@ -691,6 +689,18 @@ async def init_client():
         # await TG_BOT_APPLICATION.bot.delete_webhook()
         await TG_BOT_APPLICATION.bot.set_webhook(
             url=TG_WEBHOOK_URL, allowed_updates=Update.ALL_TYPES
+        )
+
+        await TG_BOT_APPLICATION.bot.set_my_commands(
+            commands=[
+                ("/start", "开始"),
+                ("/tasks", "查看下载任务"),
+                ("/files", "查看文件列表"),
+                ("/shares", "查看分享列表"),
+                ("/quota", "查看存储空间"),
+                ("/emptytrash", "清空回收站"),
+                ("/help", "获取帮助信息"),
+            ]
         )
         TG_BOT_APPLICATION.add_handler(
             CallbackQueryHandler(handle_tasks_operation, pattern="^delete_task:")
