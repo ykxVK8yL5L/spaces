@@ -1145,9 +1145,7 @@
                 settingStorage.getItem('webdavs').then(function (value) {
                     if (value && value.length > 0) {
                         setWebdav(value[0])
-                    } else {
-                        layer.alert("请先设置Webdav信息，以获取下载直链!!!", { icon: 5 });
-                    }
+                    } 
                 }).catch(function (err) {
                     console.log(err)
                 });
