@@ -913,7 +913,7 @@
                                     <Container fluid className="pt-2 px-0 pb-5">
                                         { loginData && (
                                             <Alert variant="success">
-                                                <Alert.Heading>打开下面登陆网址，获取Refresh Token!</Alert.Heading>
+                                                <Alert.Heading>打开下面网址，获取Refresh Token!</Alert.Heading>
                                                 <p>
                                                     <a target="_blank" href={ loginData.data.url }>{ loginData.data.url }</a>
                                                 </p>
@@ -984,6 +984,7 @@
             const [keyword, setKeyword] = useState("")
             const [search, setSearch] = useState("")
             const [videos, setVideos] = useState([])
+            const [webdav, setWebdav] = useState({})
             const setting = STORE.getState().settings;
 
             var path = location.hash.replace('#/videos', '').replace(/^\/+/, '') || '';
@@ -1019,8 +1020,13 @@
                                         size="6"
                                         className="me-2"
                                         onClick={ async () => {
-                                            let data = { "id": row.name }
-                                            await downloadMutation(data);
+                                            if (webdav.username !== undefined && webdav.username !== null) {
+                                                row.url = `https://${ webdav.username }:${ webdav.password }@dav.2dland.cn/${ path }/${ row.name }`
+                                                emitEvent("addDownload", row)
+                                            } else {
+                                                layer.alert("请先设置WebDav信息!!!", { icon: 5 });
+                                            }
+
                                         } }
                                     />)
                             }
@@ -1048,25 +1054,6 @@
                 },
             ];
             const authorization = setting.refresh_token;
-            const { data: fileData, mutateAsync: downloadMutation } = useMutation({
-                mutationKey: ["get-download"],
-                mutationFn: async (fileinfo) => {
-                    showLoading();
-                    var url = '/file/list';
-                    return await axios.get(url, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                },
-                onSuccess: async (data, variables, context) => {
-                    hideLoading();
-                },
-                onError: () => {
-                    hideLoading();
-                }
-            })
             const { data: shareData, mutateAsync: sharedMutation } = useMutation({
                 mutationKey: ["create_share"],
                 mutationFn: async (fileinfo) => {
@@ -1155,6 +1142,15 @@
             }
 
             useEffect(() => {
+                settingStorage.getItem('webdavs').then(function (value) {
+                    if (value && value.length > 0) {
+                        setWebdav(value[0])
+                    } else {
+                        layer.alert("请先设置Webdav信息，以获取下载直链!!!", { icon: 5 });
+                    }
+                }).catch(function (err) {
+                    console.log(err)
+                });
                 fetchData()
             }, []);
 
@@ -1168,11 +1164,6 @@
                 }
             }, [linksData]);
 
-            useEffect(() => {
-                if (fileData) {
-                    emitEvent("addDownload", fileData)
-                }
-            }, [fileData]);
 
             useEffect(() => {
                 if (deleteData) {
@@ -1273,7 +1264,6 @@
                 path = ''; // 处理为根目录，即 /videos 下的内容
             }
 
-
             const columns = [
                 { title: "文件名称", dataIndex: "name" },
                 { title: "大小", dataIndex: "size", render: (row) => (bytesToSize(Number(row.size))) },
@@ -1308,25 +1298,7 @@
                 },
             ];
             const authorization = setting.refresh_token;
-            const { data: fileData, mutateAsync: downloadMutation } = useMutation({
-                mutationKey: ["get-download"],
-                mutationFn: async (fileinfo) => {
-                    showLoading();
-                    var url = '/file/list';
-                    return await axios.get(url, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
-                },
-                onSuccess: async (data, variables, context) => {
-                    hideLoading();
-                },
-                onError: () => {
-                    hideLoading();
-                }
-            })
+
             const { data: recoverData, mutateAsync: recoverMutation } = useMutation({
                 mutationKey: ["recover_file"],
                 mutationFn: async (fileinfo) => {
@@ -1422,11 +1394,6 @@
                 }
             }, [linksData]);
 
-            useEffect(() => {
-                if (fileData) {
-                    emitEvent("addDownload", fileData)
-                }
-            }, [fileData]);
 
             useEffect(() => {
                 if (deleteData) {
@@ -1447,7 +1414,6 @@
             const handleSearchClick = () => {
                 setSearch(keyword)
             };
-
 
             const forceUpdate = () => {
                 setReload((pre) => !pre);
@@ -1869,7 +1835,6 @@
                     hideLoading();
                 }
             })
-
             const columns = [
                 {
                     title: "用户名",
@@ -1878,7 +1843,7 @@
                         <p>
                             { row.username } <Button
                                 data-clipboard-text={ row.username }
-                                className="bg-teal border-0 btn-sm">
+                                className="bg-teal border-0 btn-sm copybtn">
                                 <Icon
                                     icon="content-copy"
                                     size="6"
@@ -1893,7 +1858,7 @@
                         <p>
                             { row.password } <Button
                                 data-clipboard-text={ row.password }
-                                className="bg-teal border-0 btn-sm">
+                                className="bg-teal border-0 btn-sm copybtn">
                                 <Icon
                                     icon="content-copy"
                                     size="6"
@@ -1903,8 +1868,20 @@
                     ),
                 },
                 { title: "目录", dataIndex: "root" },
+                {
+                    title: "操作", dataIndex: "user_identity", render: (row) => (
+                        <IconButton
+                            onClick={ () => {
+                                deleteWebdavMutation({ user_identity: row.user_identity, username: row.username, password: row.password });
+                            } }
+                            className="bg-teal border-0"
+                            icon="delete"
+                            iconClassName="text-white"
+                            iconSize="6"
+                        />
+                    )
+                },
             ];
-
             const [webdavs, setWebdavs] = useState([])
             useEffect(() => {
                 settingStorage.setItem('webdavs', webdavs)
@@ -1930,6 +1907,81 @@
             }, [webdavData]);
 
 
+
+
+            const { data: addWebdavData, mutateAsync: addWebdavMutation, error: addWebdavError, isPending: addWebdavLoading } = useMutation({
+                mutationKey: ["create_webdav"],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = '/api/webdav/create';
+                    return await axios.post(url, query, {
+                        headers: {
+                            'Refresh-Token': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            const { data: deleteWebdavData, mutateAsync: deleteWebdavMutation, error: deleteWebdavError, isPending: deleteWebdavLoading } = useMutation({
+                mutationKey: ["create_webdav"],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = '/api/webdav/delete';
+                    return await axios.delete(url, {
+                        data: query,
+                        headers: {
+                            'Refresh-Token': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+
+
+
+            const [show, setShow] = useState(false);
+            const [webdav, setWebdav] = useState({});
+            const handleClose = () => {
+                setWebdav({});
+                setShow(false)
+            };
+            const handleShow = () => setShow(true);
+            const onSave = () => {
+                var data = { username: webdav.username, password: webdav.password, root: webdav.root, enable_flag: 1 }
+                addWebdavMutation(data)
+            }
+
+            useEffect(() => {
+                if (addWebdavData) {
+                    if (addWebdavData.data.hasOwnProperty('user_identity')) {
+                        handleClose()
+                        webdavMutation({})
+                    }
+                }
+            }, [addWebdavData]);
+
+            useEffect(() => {
+                if (deleteWebdavData) {
+                    if (deleteWebdavData.data.hasOwnProperty('user_identity')) {
+                        webdavMutation({})
+                    }
+                }
+            }, [deleteWebdavData]);
+
             return (
                 <div>
                     <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
@@ -1940,15 +1992,57 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
-                                        fetchData();
-                                    } }
-                                    text="刷新"
+                                    onClick={ handleShow }
+                                    text="新建用户"
                                     className="bg-teal border-0"
-                                    icon="reload"
+                                    icon="plus"
                                     iconClassName="me-1 text-white"
                                     iconSize="6"
                                 />
+                                <Modal show={ show } onHide={ handleClose }>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>创建新用户</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        <Form>
+                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextEmail">
+                                                <Form.Label column sm="2">
+                                                    用户名:
+                                                </Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, username: e.target.value }) } } />
+                                                </Col>
+                                            </Form.Group>
+
+                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextPassword">
+                                                <Form.Label column sm="2">
+                                                    密码:
+                                                </Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, password: e.target.value }) } } />
+                                                </Col>
+                                            </Form.Group>
+
+                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextPassword">
+                                                <Form.Label column sm="2">
+                                                    目录:
+                                                </Form.Label>
+                                                <Col sm="10">
+                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, root: e.target.value }) } } />
+                                                </Col>
+                                            </Form.Group>
+
+                                        </Form>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={ handleClose }>
+                                            取消
+                                        </Button>
+                                        <Button variant="primary" onClick={ onSave }>
+                                            保存
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
                             </ButtonGroup>
                         </ButtonToolbar>
 
@@ -1965,7 +2059,7 @@
 
                                     <Button
                                         data-clipboard-target="#davaddress"
-                                        className="bg-teal border-0 btn">
+                                        className="bg-teal border-0 copybtn">
                                         <Icon
                                             icon="content-copy"
                                             size="6"
@@ -1981,7 +2075,7 @@
                                     <Form.Control placeholder="443" id="davport" value="443" readOnly />
                                     <Button
                                         data-clipboard-target="#davport"
-                                        className="bg-teal border-0 btn">
+                                        className="bg-teal border-0 copybtn">
                                         <Icon
                                             icon="content-copy"
                                             size="6"
@@ -2324,6 +2418,19 @@
                                     });
                                 } }
                             />
+
+                            <Button
+                                data-clipboard-text={ row.url }
+                                className="border-0 copybtn p-0 m-0 bg-transparent me-2">
+                                <Icon
+                                    icon="content-copy"
+                                    size="6"
+                                    className="text-black"
+                                />
+                            </Button>
+
+
+
                             <Icon
                                 icon="pencil-outline"
                                 size="6"
@@ -2390,15 +2497,7 @@
                 }
             })
             const addDowload = (fileinfo) => {
-                const file = fileinfo.data;
-                var url = file.web_content_link;
-                for (const obj of file.medias) {
-                    if (obj.link.url.trim().length > 10) {
-                        url = obj.link.url;
-                        break;
-                    }
-                }
-                const download = { name: file.name, size: Number(file.size), url: url, created: file.created_time }
+                const download = { name: fileinfo.name, size: Number(fileinfo.size), url: fileinfo.url, created: fileinfo.create_ts }
                 setAddDownloadObject(download)
             }
             useEffect(() => {
@@ -2508,7 +2607,7 @@
             </QueryClientProvider>
         );
 
-        var clipboard = new ClipboardJS('.btn');
+        var clipboard = new ClipboardJS('.copybtn');
 
         clipboard.on('success', function (e) {
             layer.msg("复制成功");
