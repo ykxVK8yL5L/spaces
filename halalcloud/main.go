@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//go:embed templates/index.html
 var content embed.FS
 
 func main() {
