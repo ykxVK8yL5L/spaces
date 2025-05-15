@@ -34,6 +34,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+    <script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
 
     <style>
         .bi {
@@ -884,6 +885,23 @@
                                                     />
                                                     离线任务
                                                 </Nav.Link>
+
+                                                <Nav.Link
+                                                    as={ Link }
+                                                    className="nav-link text-dark"
+                                                    to="/webdav"
+                                                    onClick={
+                                                        handleSidebarClose
+                                                    }
+                                                >
+                                                    <Icon
+                                                        icon="cloud-outline"
+                                                        size="6"
+                                                        className="me-2"
+                                                    />
+                                                    WebDav
+                                                </Nav.Link>
+
                                             </Nav>
                                         </Container>
                                     </Offcanvas.Body>
@@ -1830,6 +1848,175 @@
         };
 
 
+        const WebDav = () => {
+            const authorization = STORE.getState().settings.refresh_token;
+            const { data: webdavData, mutateAsync: webdavMutation, error: webdavError, isPending: webdavLoading } = useMutation({
+                mutationKey: ["get_webdav"],
+                mutationFn: async (query) => {
+                    showLoading();
+                    var url = '/api/webdav/listall';
+                    return await axios.post(url, query, {
+                        headers: {
+                            'Refresh-Token': authorization,
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                },
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
+            })
+
+            const columns = [
+                {
+                    title: "用户名",
+                    dataIndex: "username",
+                    render: (row) => (
+                        <p>
+                            { row.username } <Button
+                                data-clipboard-text={ row.username }
+                                className="bg-teal border-0 btn-sm">
+                                <Icon
+                                    icon="content-copy"
+                                    size="6"
+                                />
+                            </Button>
+                        </p>
+                    ),
+
+                },
+                {
+                    title: "密码", dataIndex: "password", render: (row) => (
+                        <p>
+                            { row.password } <Button
+                                data-clipboard-text={ row.password }
+                                className="bg-teal border-0 btn-sm">
+                                <Icon
+                                    icon="content-copy"
+                                    size="6"
+                                />
+                            </Button>
+                        </p>
+                    ),
+                },
+                { title: "目录", dataIndex: "root" },
+            ];
+
+            const [webdavs, setWebdavs] = useState([])
+            useEffect(() => {
+                settingStorage.setItem('webdavs', webdavs)
+            }, [webdavs]);
+
+            useEffect(() => {
+                settingStorage.getItem('webdavs').then(function (value) {
+                    if (value) {
+                        setWebdavs(value)
+                    }
+                }).catch(function (err) {
+                    console.log(err)
+                });
+                webdavMutation({})
+            }, []);
+
+            useEffect(() => {
+                if (webdavData) {
+                    if (webdavData.data.hasOwnProperty('configs')) {
+                        setWebdavs([...webdavData.data.configs])
+                    }
+                }
+            }, [webdavData]);
+
+
+            return (
+                <div>
+                    <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+                        <label className="fs-3">WebDav设置</label>
+                        <ButtonToolbar
+                            aria-label="WebDav设置"
+                            className="bg-teal rounded"
+                        >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={ () => {
+                                        fetchData();
+                                    } }
+                                    text="刷新"
+                                    className="bg-teal border-0"
+                                    icon="reload"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+                        </ButtonToolbar>
+
+                    </div>
+                    <Alert variant="info">
+                        WebDAV是一种通过HTTP协议进行文件管理的协议。它允许用户在Web服务器上创建、编辑、删除和管理文件，受到许多媒体播放器支持
+                    </Alert>
+                    <Container fluid className="p-2">
+                        <Form>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Form.Label>服务器地址</Form.Label>
+                                <InputGroup className="mb-3">
+                                    <Form.Control placeholder="https://dav.2dland.cn" id="davaddress" value="https://dav.2dland.cn" readOnly />
+
+                                    <Button
+                                        data-clipboard-target="#davaddress"
+                                        className="bg-teal border-0 btn">
+                                        <Icon
+                                            icon="content-copy"
+                                            size="6"
+                                            className="me-2"
+                                        />
+                                    </Button>
+                                </InputGroup>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Form.Label>服务器端口</Form.Label>
+                                <InputGroup className="mb-3">
+                                    <Form.Control placeholder="443" id="davport" value="443" readOnly />
+                                    <Button
+                                        data-clipboard-target="#davport"
+                                        className="bg-teal border-0 btn">
+                                        <Icon
+                                            icon="content-copy"
+                                            size="6"
+                                            className="me-2"
+                                        />
+                                    </Button>
+                                </InputGroup>
+                            </Form.Group>
+
+
+                        </Form>
+
+                        { webdavError && (
+                            <div className="text-center text-danger">
+                                发生错误，请稍后重试！！！
+                            </div>
+                        ) }
+
+                        { webdavLoading && (
+                            <div className="text-center text-success">
+                                正在努力加载中...
+                            </div>
+                        ) }
+
+                        { webdavs && (
+                            <Row>
+                                <DataTable data={ webdavs ? webdavs : [] } columns={ columns } />
+                            </Row>
+                        ) }
+
+
+                    </Container>
+                </div>
+            )
+        }
 
         const Offline = () => {
             const [selectedOption, setSelectedOption] = useState(1);
@@ -2104,7 +2291,6 @@
 
                 </div >);
         };
-
         const LocalTasks = () => {
             const [show, setShow] = useState(false);
             const handleClose = () => setShow(false);
@@ -2312,6 +2498,7 @@
                                 <Route path="/" exact component={ Videos } />
                                 <Route path="/shares" exact component={ Shares } />
                                 <Route path="/trash" exact component={ Trash } />
+                                <Route path="/webdav" exact component={ WebDav } />
                                 <Route path="/offlinetask" exact component={ OfflineTask } />
                                 <Route path="/videos/*" component={ Videos } />
                             </Switch>
@@ -2320,6 +2507,17 @@
                 </HashRouter>
             </QueryClientProvider>
         );
+
+        var clipboard = new ClipboardJS('.btn');
+
+        clipboard.on('success', function (e) {
+            layer.msg("复制成功");
+            e.clearSelection();
+        });
+
+        clipboard.on('error', function (e) {
+            layer.msg("复制失败");
+        });
 
         $(document).ready(function () {
             $(window).scroll(function () {
