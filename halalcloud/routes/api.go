@@ -63,6 +63,8 @@ func SetupRoutes(router *gin.Engine) {
 	webdav := api.Group("/webdav")
 	{
 		webdav.POST("/get", handlers.GetWebdav)
+		webdav.POST("/listall", handlers.ListAllWebdav)
+		webdav.DELETE("/delete", handlers.DeleteWebdav)
 		webdav.POST("/enable", handlers.EnableWebdav)
 		webdav.POST("/disable", handlers.DisableWebdav)
 		webdav.POST("/update", handlers.UpdateWebdav)
