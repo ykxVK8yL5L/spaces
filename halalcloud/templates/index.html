@@ -759,7 +759,7 @@
                 if (logoutData) {
                     settingStorage.setItem('auth_info', {})
                     settingStorage.setItem('webdavs', {})
-                    settingStorage.setItem('downloads', {})
+                    settingStorage.setItem('downloads', [])
                     STORE.dispatch({ type: 'SAVE_SETTING', payload: {} })
                 }
             }, [logoutData]);
