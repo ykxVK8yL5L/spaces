@@ -1036,8 +1036,21 @@
                                 size="6"
                                 className="me-2"
                                 onClick={ async () => {
-                                    let data = { "id": row.name }
-                                    await deleteMutation(data);
+                                    layer.open({
+                                        type: 1,
+                                        title: '直接删除将不会把文件放到回收站!!!!',
+                                        btn: ['回收站', '直接删除'],
+                                        yes: async function (index, layero) {
+                                            let data = { "id": row.name, url: "/api/file/trash" }
+                                            await deleteMutation(data);
+                                            layer.close(index);
+                                        },
+                                        btn2: async function (index, layero) {
+                                            let data = { "id": row.name, url: "/api/file/delete" }
+                                            await deleteMutation(data, url);
+                                            layer.close(index);
+                                        }
+                                    });
                                 } }
                             />
                             <Icon
@@ -1080,9 +1093,8 @@
                 mutationFn: async (fileinfo) => {
                     showLoading();
                     var fiel_path = path + '/' + fileinfo.id;
-                    var url = '/api/file/delete';
                     var data = { source: [{ path: fiel_path }] }
-                    return await axios.delete(url, {
+                    return await axios.delete(fileinfo.url, {
                         data: data,
                         headers: {
                             'Refresh-Token': authorization,
@@ -1145,7 +1157,7 @@
                 settingStorage.getItem('webdavs').then(function (value) {
                     if (value && value.length > 0) {
                         setWebdav(value[0])
-                    } 
+                    }
                 }).catch(function (err) {
                     console.log(err)
                 });
@@ -1903,8 +1915,6 @@
                     }
                 }
             }, [webdavData]);
-
-
 
 
             const { data: addWebdavData, mutateAsync: addWebdavMutation, error: addWebdavError, isPending: addWebdavLoading } = useMutation({
