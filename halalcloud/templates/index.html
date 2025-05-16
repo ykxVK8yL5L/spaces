@@ -353,29 +353,6 @@
             saveStateToLocalStorage(STORE.getState().settings);
         });
 
-
-        //数据校验
-        // var ajv = new ajv7.default()
-        // const schema = {
-        // 	type: "object",
-        // 	properties: {
-        // 		foo: { type: "integer" },
-        // 		bar: { type: "string" }
-        // 	},
-        // 	required: ["foo"],
-        // 	additionalProperties: false
-        // }
-
-        // const validate = ajv.compile(schema)
-
-        // const data = {
-        // 	foo: 1,
-        // 	bar: "abc"
-        // }
-        // const valid = validate(data)
-        // if (!valid) console.log(validate.errors)
-
-
         const bytesToSize = (bytes) => {
             if (bytes === 0) return '0 B';
             var k = 1024;
@@ -395,7 +372,6 @@
         };
 
         const pathJoin = (...args) => {
-            // 合并所有传入的路径
             let joinedPath = args
                 .map(arg => arg.trim())  // 移除每个路径部分的空格
                 .filter(arg => arg.length > 0)  // 过滤掉空字符串
@@ -403,12 +379,10 @@
 
             // 替换多余的斜杠
             joinedPath = joinedPath.replace(/\/+/g, '/');
-
             // 处理路径的开头和结尾部分
             // if (joinedPath.startsWith('/')) {
             //     joinedPath = '/' + joinedPath;  // 如果路径以 / 开头，保持它
             // }
-
             return joinedPath;
         }
 
@@ -452,7 +426,6 @@
             Row,
             Table,
         } = ReactBootstrap;
-        //注意修改js文件后需要直接访问js以更新浏览器缓存
 
         // 表格组件
         const DataTable = ({ data, columns }) => {
@@ -762,6 +735,15 @@
                 enabled: false,
             })
 
+            const { data: logoutData, refetch: logoutRefetch, isLoading: logoutLoading, error: logoutError } = useQuery({
+                queryKey: ['logout'],
+                queryFn: async () => {
+                    var url = '/api/user/logoff';
+                    return await axios.post(url, { "refresh_token": globalSetting.refresh_token })
+                },
+                enabled: false,
+            })
+
             const [showLogin, setShowLogin] = useState(false);
             const globalSetting = STORE.getState().settings;
             useEffect(() => {
@@ -771,6 +753,19 @@
                     return
                 }
             }, []);
+
+
+            useEffect(() => {
+                if (logoutData) {
+                    settingStorage.setItem('auth_info', {})
+                    settingStorage.setItem('webdavs', {})
+                    settingStorage.setItem('downloads', {})
+                    STORE.dispatch({ type: 'SAVE_SETTING', payload: {} })
+                }
+            }, [logoutData]);
+
+
+
 
             const [showSideBar, setShowSideBar] = useState(false);
             const handleSidebarClose = () => setShowSideBar(false);
@@ -810,6 +805,8 @@
                                     <Offline />
                                     <Tasks />
                                     <LocalTasks />
+
+
                                     <Button
                                         style={{
                                             backgroundColor: "transparent",
@@ -832,6 +829,29 @@
                                             setSetting(false);
                                         }}
                                     />
+
+                                    <Button
+                                        style={{
+                                            backgroundColor: "transparent",
+                                        }}
+                                        className="nav-link btn"
+                                        onClick={() => {
+                                            if (globalSetting && globalSetting.refresh_token && globalSetting.refresh_token.length > 5) {
+                                                logoutRefetch()
+                                            } else {
+                                                layer.alert("Rfresh Token不能为空!!!", { icon: 5 });
+                                            }
+                                        }}
+                                        children={
+                                            <Icon
+                                                icon="logout"
+                                                size="3"
+                                                className="text-white"
+                                            />
+                                        }
+                                    ></Button>
+
+
                                 </div>
                             </Container>
                         </Navbar>
