@@ -12,7 +12,6 @@ import (
 	pbPublicUser "github.com/city404/v6-public-rpc-proto/go/v6/user"
 	"github.com/google/uuid"
 	"github.com/halalcloud/golang-sdk/utils"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -80,7 +79,7 @@ func NewAuthServiceWithOauth(appID, appVersion, appSecret string, options ...Hal
 
 }
 
-func NewAuthService(appID, appVersion, appSecret, refreshToken string, options ...HalalOption) (*AuthService, error) {
+func NewAuthService(appID, appVersion, appSecret, refreshToken string, accessToken string, accessTokenExpiredAt int64, options ...HalalOption) (*AuthService, error) {
 
 	svc := &AuthService{
 		appID:        appID,
@@ -90,32 +89,17 @@ func NewAuthService(appID, appVersion, appSecret, refreshToken string, options .
 		dopts:        defaultOptions(),
 	}
 
-	if len(refreshToken) < 1 {
-		refreshToken = viper.GetString("refresh_token")
-	}
-
-	// read access token from config
-
-	readedAccessToken := viper.GetString("access_token")
+	readedAccessToken := accessToken
 	if len(readedAccessToken) > 0 {
 		// svc.accessToken = readedAccessToken
-		accessTokenExpiredAt := viper.GetInt64("access_token_expired_at")
+		accessTokenExpiredAt := accessTokenExpiredAt
 		current := time.Now().UnixMilli()
 		if accessTokenExpiredAt < current {
 			// access token expired
-			// svc.accessToken = ""
-			// svc.accessTokenExpiredAt = 0
-			// readedAccessToken = ""
+			svc.accessToken = ""
+			svc.accessTokenExpiredAt = 0
+			readedAccessToken = ""
 			println("access token expired:", accessTokenExpiredAt)
-			viper.Set("access_token", "")
-			viper.Set("access_token_expired_at", 0)
-			err := viper.WriteConfig()
-			if err != nil {
-				err = viper.SafeWriteConfig()
-			}
-			if err != nil {
-				println(err.Error())
-			}
 		} else {
 			svc.accessTokenExpiredAt = accessTokenExpiredAt
 			svc.accessToken = readedAccessToken
@@ -177,7 +161,7 @@ func NewAuthService(appID, appVersion, appSecret, refreshToken string, options .
 				if len(refreshResponse.AccessToken) > 0 {
 					svc.accessToken = refreshResponse.AccessToken
 					svc.accessTokenExpiredAt = refreshResponse.AccessTokenExpireTs
-					svc.OnAccessTokenRefreshed(refreshResponse.AccessToken, refreshResponse.AccessTokenExpireTs, refreshResponse.RefreshToken, refreshResponse.RefreshTokenExpireTs)
+					//svc.OnAccessTokenRefreshed(refreshResponse.AccessToken, refreshResponse.AccessTokenExpireTs, refreshResponse.RefreshToken, refreshResponse.RefreshTokenExpireTs)
 				}
 				// retry
 				ctxx := svc.signContext(method, ctx)
@@ -221,18 +205,6 @@ func (s *AuthService) OnAccessTokenRefreshed(accessToken string, accessTokenExpi
 	s.configMutex.Lock()
 	defer s.configMutex.Unlock()
 	s.refreshToken = refreshToken
-	viper.Set("refresh_token", refreshToken)
-	viper.Set("access_token", accessToken)
-	viper.Set("access_token_expired_at", accessTokenExpiredAt)
-	viper.Set("refresh_token_expired_at", refreshTokenExpiredAt)
-	err := viper.WriteConfig()
-	if err != nil {
-		err = viper.SafeWriteConfig()
-	}
-	if err != nil {
-		println(err.Error())
-	}
-
 	if s.dopts.onTokenRefreshed != nil {
 		s.dopts.onTokenRefreshed(accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt)
 	}
@@ -241,6 +213,27 @@ func (s *AuthService) OnAccessTokenRefreshed(accessToken string, accessTokenExpi
 
 func (s *AuthService) GetGrpcConnection() *grpc.ClientConn {
 	return s.grpcConnection
+}
+
+type AuthInfo struct {
+	AppID                string `json:"app_id"`
+	AppVersion           string `json:"app_version"`
+	AppSecret            string `json:"app_secret"`
+	RefreshToken         string `json:"refresh_token"`
+	AccessToken          string `json:"access_token"`
+	AccessTokenExpiredAt int64  `json:"expire_at"`
+}
+
+func (s *AuthService) GetAuth() *AuthInfo {
+	sai := &AuthInfo{
+		AppID:                s.appID,
+		AppVersion:           s.appVersion,
+		AppSecret:            s.appSecret,
+		RefreshToken:         s.refreshToken,
+		AccessToken:          s.accessToken,
+		AccessTokenExpiredAt: s.accessTokenExpiredAt,
+	}
+	return sai
 }
 
 func (s *AuthService) Close() {
