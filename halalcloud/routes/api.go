@@ -23,7 +23,7 @@ func SetupRoutes(router *gin.Engine) {
 		file.POST("/create", handlers.CreateFolderFile)
 		file.POST("/move", handlers.MoveFiles)
 		file.POST("/copy", handlers.CopyFiles)
-		file.POST("/trash", handlers.TrashFiles)
+		file.DELETE("/trash", handlers.TrashFiles)
 		file.POST("/rename", handlers.RenameFiles)
 		file.POST("/batchrename", handlers.BatchRenameFiles)
 		file.POST("/recover", handlers.RecoverFiles)
