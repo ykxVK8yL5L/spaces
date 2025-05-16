@@ -218,7 +218,7 @@
             const randomString = Math.random()
                 .toString(36)
                 .substring(2, 10); // 生成一个随机字符串确保event每次的值不一样，如果一样会不触发事件
-            const identity = `${ Date.now() }-${ randomString }`;
+            const identity = `${Date.now()}-${randomString}`;
             // 存储到 localStorage，以便其他页面能够接收到
             localStorage.setItem(
                 "event",
@@ -267,14 +267,16 @@
             async function (config) {
                 if (!config.url.includes('/api/login')) {
                     const value = await settingStorage.getItem('auth_info');
-                    if (value.hasOwnProperty('access_token')) {
-                        config.headers['Refresh-Token'] = `${ value.refresh_token }`;
-                        config.headers['Access-Token'] = `${ value.access_token }`;
-                        config.headers['Access-Token-Expired-At'] = `${ value.expire_at }`;
-                    } else {
-                        config.headers['Refresh-Token'] = `${ value.refresh_token }`;
-                        config.headers['Access-Token'] = "";
-                        config.headers['Access-Token-Expired-At'] = 0;
+                    if (value) {
+                        if (value.hasOwnProperty('access_token')) {
+                            config.headers['Refresh-Token'] = `${value.refresh_token}`;
+                            config.headers['Access-Token'] = `${value.access_token}`;
+                            config.headers['Access-Token-Expired-At'] = `${value.expire_at}`;
+                        } else {
+                            config.headers['Refresh-Token'] = `${value.refresh_token}`;
+                            config.headers['Access-Token'] = "";
+                            config.headers['Access-Token-Expired-At'] = 0;
+                        }
                     }
                 }
                 return config;
@@ -458,24 +460,24 @@
                 <Table responsive bordered>
                     <thead>
                         <tr className="text-center">
-                            { columns.map((column, index) => (
-                                <th key={ index }>{ column.title }</th>
-                            )) }
+                            {columns.map((column, index) => (
+                                <th key={index}>{column.title}</th>
+                            ))}
                         </tr>
                     </thead>
                     <tbody>
-                        { data.map((row, rowIndex) => (
-                            <tr key={ rowIndex } className="text-center">
-                                { columns.map((column, colIndex) => (
-                                    <td key={ colIndex }>
-                                        {/* 调用渲染方法，如果没有定义，则直接显示数据 */ }
-                                        { column.render
+                        {data.map((row, rowIndex) => (
+                            <tr key={rowIndex} className="text-center">
+                                {columns.map((column, colIndex) => (
+                                    <td key={colIndex}>
+                                        {/* 调用渲染方法，如果没有定义，则直接显示数据 */}
+                                        {column.render
                                             ? column.render(row)
-                                            : row[column.dataIndex] }
+                                            : row[column.dataIndex]}
                                     </td>
-                                )) }
+                                ))}
                             </tr>
-                        )) }
+                        ))}
                     </tbody>
                 </Table>
             );
@@ -495,23 +497,23 @@
                 return (
                     <select
                         className="page-link border-0 h-100 py-0"
-                        style={ { width: "auto" } }
-                        onChange={ (e) => {
+                        style={{ width: "auto" }}
+                        onChange={(e) => {
                             props.onClick(parseInt(e.target.value));
-                        } }
+                        }}
                     >
-                        { pageNumbers.map((number) => {
+                        {pageNumbers.map((number) => {
                             const selected = number === page ? true : false;
                             return (
                                 <option
-                                    key={ number }
-                                    value={ number }
-                                    selected={ selected }
+                                    key={number}
+                                    value={number}
+                                    selected={selected}
                                 >
-                                    { number }
+                                    {number}
                                 </option>
                             );
-                        }) }
+                        })}
                     </select>
                 );
             };
@@ -519,42 +521,42 @@
                 <div className="d-flex justify-content-center align-items-baseline">
 
                     <Pagination>
-                        { pageCount > 1 && page > 1 && (
+                        {pageCount > 1 && page > 1 && (
                             <Pagination.First
-                                onClick={ () => {
+                                onClick={() => {
                                     props.onClick(1);
-                                } }
+                                }}
                             />
-                        ) }
-                        { pageCount > 1 && page > 1 && (
+                        )}
+                        {pageCount > 1 && page > 1 && (
                             <Pagination.Prev
-                                onClick={ () => {
+                                onClick={() => {
                                     props.onClick(page - 1);
-                                } }
+                                }}
                             />
-                        ) }
+                        )}
                         <Pagination.Item linkClassName="p-0 h-100 d-inline-block">
                             <SelectItems />
                         </Pagination.Item>
                         <Pagination.Item>
                             <span className="text-info">
-                                { page }/{ pageCount }
+                                {page}/{pageCount}
                             </span>
                         </Pagination.Item>
-                        { pageCount > 1 && page < pageCount && (
+                        {pageCount > 1 && page < pageCount && (
                             <Pagination.Next
-                                onClick={ () => {
+                                onClick={() => {
                                     props.onClick(page + 1);
-                                } }
+                                }}
                             />
-                        ) }
-                        { pageCount > 1 && page < pageCount && (
+                        )}
+                        {pageCount > 1 && page < pageCount && (
                             <Pagination.Last
-                                onClick={ () => {
+                                onClick={() => {
                                     props.onClick(pageCount);
-                                } }
+                                }}
                             />
-                        ) }
+                        )}
                     </Pagination>
                 </div>
             );
@@ -563,8 +565,8 @@
         const Icon = (props) => {
             return (
                 <span
-                    onClick={ props.onClick }
-                    className={ `mdi mdi-${ props.icon } fs-${ props.size } ${ props.className }` }
+                    onClick={props.onClick}
+                    className={`mdi mdi-${props.icon} fs-${props.size} ${props.className}`}
                 ></span>
             );
         };
@@ -573,13 +575,13 @@
             return (
                 <Button
                     variant="success"
-                    onClick={ props.onClick }
-                    className={ props.className }
+                    onClick={props.onClick}
+                    className={props.className}
                 >
                     <span
-                        className={ `mdi mdi-${ props.icon } fs-${ props.iconSize } ${ props.iconClassName }` }
+                        className={`mdi mdi-${props.icon} fs-${props.iconSize} ${props.iconClassName}`}
                     ></span>
-                    { props.text }
+                    {props.text}
                 </Button>
             );
         };
@@ -612,10 +614,10 @@
             }, [props.src]);
             if (loadedSrc === props.src) {
                 return (
-                    <img { ...props } />
+                    <img {...props} />
                 );
             }
-            return <img { ...props } src="https://placehold.co/600x400?text=Loading" />;
+            return <img {...props} src="https://placehold.co/600x400?text=Loading" />;
         };
 
         //设置框
@@ -637,49 +639,49 @@
                 STORE.dispatch({ type: 'SAVE_SETTING', payload: setting })
             }
             return (
-                <Modal show={ props.show } onHide={ props.onHide } onShow={ loadSetting }>
-                    <Modal.Header closeButton onHide={ props.onHide }>
+                <Modal show={props.show} onHide={props.onHide} onShow={loadSetting}>
+                    <Modal.Header closeButton onHide={props.onHide}>
                         <Modal.Title>设置</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
                             <ListGroup>
-                                { settings.map((value, index) => {
+                                {settings.map((value, index) => {
                                     const key = Object.keys(value)[0];
                                     const items = value[key];
                                     return (<ListGroup.Item>
-                                        { items.map((setting_item) => {
+                                        {items.map((setting_item) => {
                                             return (
-                                                <Form.Group as={ Row } className="mb-3">
+                                                <Form.Group as={Row} className="mb-3">
                                                     <Form.Label column sm="3">
-                                                        { setting_item.label }
+                                                        {setting_item.label}
                                                     </Form.Label>
                                                     <Col sm="9">
-                                                        <Form.Control type={ setting_item.show ? "input" : "password" } value={ setting[setting_item.key] } name={ setting_item.key } placeholder={ setting_item.label } onChange={ (e) => { setSetting({ ...setting, [setting_item.key]: e.target.value }) } } />
+                                                        <Form.Control type={setting_item.show ? "input" : "password"} value={setting[setting_item.key]} name={setting_item.key} placeholder={setting_item.label} onChange={(e) => { setSetting({ ...setting, [setting_item.key]: e.target.value }) }} />
                                                     </Col>
                                                 </Form.Group>
                                             )
-                                        }) }
+                                        })}
                                     </ListGroup.Item>)
-                                }) }
+                                })}
                             </ListGroup>
                         </Form>
                     </Modal.Body>
                     <Modal.Footer className="justify-content-between">
                         <Button
                             variant="secondary"
-                            onClick={ () => {
+                            onClick={() => {
                                 props.onHide();
-                            } }
+                            }}
                         >
                             关闭
                         </Button>
                         <Button
                             variant="primary"
-                            onClick={ () => {
+                            onClick={() => {
                                 saveSetting();
                                 props.onHide();
-                            } }
+                            }}
                         >
                             保存
                         </Button>
@@ -729,20 +731,20 @@
         }
 
         const paginateFavoritesGet = async (limit, page, keyword) => {
-            const url = `/favorites?size=${ limit }&page=${ page }&kw=${ keyword }`;
+            const url = `/favorites?size=${limit}&page=${page}&kw=${keyword}`;
             const { data } = await axios.get(url)
             return data
         }
 
         const paginateTagLinksGet = async (limit, page, tag) => {
-            const url = `/tags?size=${ limit }&page=${ page }&tag=${ tag }`;
+            const url = `/tags?size=${limit}&page=${page}&tag=${tag}`;
             const { data } = await axios.get(url)
             return data
         }
 
         const paginateTasksGet = async (limit, skip) => {
             const setting = STORE.getState().settings;
-            const url = setting.directus_host + `items/task?limit=${ limit }&offset=${ skip }&meta[]=filter_count&sort[]=-id`;
+            const url = setting.directus_host + `items/task?limit=${limit}&offset=${skip}&meta[]=filter_count&sort[]=-id`;
             const { data } = await axios.get(url, { headers: { Authorization: "Bearer " + setting.directus_token } })
             return data
         }
@@ -787,7 +789,7 @@
                                 <div>
                                     <Navbar.Toggle
                                         className="shadow-none border-0"
-                                        onClick={ handleSidebarShow }
+                                        onClick={handleSidebarShow}
                                         children={
                                             <Icon
                                                 icon="menu"
@@ -797,7 +799,7 @@
                                         }
                                     />
                                     <Navbar.Brand
-                                        as={ Link }
+                                        as={Link}
                                         to="/"
                                         className="text-white"
                                     >
@@ -809,13 +811,13 @@
                                     <Tasks />
                                     <LocalTasks />
                                     <Button
-                                        style={ {
+                                        style={{
                                             backgroundColor: "transparent",
-                                        } }
+                                        }}
                                         className="nav-link btn"
-                                        onClick={ () => {
+                                        onClick={() => {
                                             setSetting(true)
-                                        } }
+                                        }}
                                         children={
                                             <Icon
                                                 icon="dots-vertical"
@@ -825,17 +827,17 @@
                                         }
                                     ></Button>
                                     <SettingModal
-                                        show={ setting }
-                                        onHide={ () => {
+                                        show={setting}
+                                        onHide={() => {
                                             setSetting(false);
-                                        } }
+                                        }}
                                     />
                                 </div>
                             </Container>
                         </Navbar>
                     </header>
                     <Container fluid>
-                        <Row style={ { minHeight: "100vh" } }>
+                        <Row style={{ minHeight: "100vh" }}>
                             <Col
                                 md="2"
                                 lg="2"
@@ -844,8 +846,8 @@
                             >
                                 <Offcanvas
                                     className="leftsidebar h-100 bg-light"
-                                    show={ showSideBar }
-                                    onHide={ handleSidebarClose }
+                                    show={showSideBar}
+                                    onHide={handleSidebarClose}
                                     placement="start"
                                     responsive="md"
                                 >
@@ -864,7 +866,7 @@
                                                 className="flex-column"
                                             >
                                                 <Nav.Link
-                                                    as={ Link }
+                                                    as={Link}
                                                     className="nav-link text-dark"
                                                     to="/"
                                                     onClick={
@@ -879,7 +881,7 @@
                                                     文件列表
                                                 </Nav.Link>
                                                 <Nav.Link
-                                                    as={ Link }
+                                                    as={Link}
                                                     className="nav-link text-dark"
                                                     to="/trash"
                                                     onClick={
@@ -894,7 +896,7 @@
                                                     回收站
                                                 </Nav.Link>
                                                 <Nav.Link
-                                                    as={ Link }
+                                                    as={Link}
                                                     className="nav-link text-dark"
                                                     to="/shares"
                                                     onClick={
@@ -909,7 +911,7 @@
                                                     分享列表
                                                 </Nav.Link>
                                                 <Nav.Link
-                                                    as={ Link }
+                                                    as={Link}
                                                     className="nav-link text-dark"
                                                     to="/offlinetask"
                                                     onClick={
@@ -925,7 +927,7 @@
                                                 </Nav.Link>
 
                                                 <Nav.Link
-                                                    as={ Link }
+                                                    as={Link}
                                                     className="nav-link text-dark"
                                                     to="/webdav"
                                                     onClick={
@@ -949,24 +951,24 @@
                             <Col xs="12" sm="12" md="10" lg="10" xl="10">
                                 <main>
                                     <Container fluid className="pt-2 px-0 pb-5">
-                                        { loginData && (
+                                        {loginData && (
                                             <Alert variant="success">
                                                 <Alert.Heading>打开下面网址，获取Refresh Token!</Alert.Heading>
                                                 <p>
-                                                    <a target="_blank" href={ loginData.data.url }>{ loginData.data.url }</a>
+                                                    <a target="_blank" href={loginData.data.url}>{loginData.data.url}</a>
                                                 </p>
                                             </Alert>
-                                        ) }
+                                        )}
 
-                                        { loginError && (
+                                        {loginError && (
                                             <Alert variant="danger">
                                                 <p>
-                                                    { JSON.stringify(loginError) }
+                                                    {JSON.stringify(loginError)}
                                                 </p>
                                             </Alert>
-                                        ) }
+                                        )}
 
-                                        { children }
+                                        {children}
                                     </Container>
                                 </main>
                             </Col>
@@ -988,9 +990,9 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         alert("test")
-                                    } }
+                                    }}
                                     text="刷新"
                                     className="bg-teal border-0"
                                     icon="reload"
@@ -998,9 +1000,9 @@
                                     iconSize="6"
                                 />
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         alert("hello");
-                                    } }
+                                    }}
                                     text="删除"
                                     className="bg-teal border-0"
                                     icon="delete-outline"
@@ -1042,9 +1044,9 @@
                         <div className="d-flex justify-content-center">
                             {
                                 row.dir ? (<Nav.Link
-                                    as={ Link }
+                                    as={Link}
                                     className="nav-link text-dark"
-                                    to={ `/videos/${ path }/${ row.name }` }
+                                    to={`/videos/${path}/${row.name}`}
                                     target="_blank"
                                 >
                                     <Icon
@@ -1057,15 +1059,15 @@
                                         icon="download-outline"
                                         size="6"
                                         className="me-2"
-                                        onClick={ async () => {
+                                        onClick={async () => {
                                             if (webdav.username !== undefined && webdav.username !== null) {
-                                                row.url = `https://${ webdav.username }:${ webdav.password }@dav.2dland.cn/${ path }/${ row.name }`
+                                                row.url = `https://${webdav.username}:${webdav.password}@dav.2dland.cn/${path}/${row.name}`
                                                 emitEvent("addDownload", row)
                                             } else {
                                                 layer.alert("请先设置WebDav信息!!!", { icon: 5 });
                                             }
 
-                                        } }
+                                        }}
                                     />)
                             }
 
@@ -1073,7 +1075,7 @@
                                 icon="delete"
                                 size="6"
                                 className="me-2"
-                                onClick={ async () => {
+                                onClick={async () => {
                                     layer.open({
                                         type: 1,
                                         title: '直接删除将不会把文件放到回收站!!!!',
@@ -1089,16 +1091,16 @@
                                             layer.close(index);
                                         }
                                     });
-                                } }
+                                }}
                             />
                             <Icon
                                 icon="share-variant"
                                 size="6"
                                 className="me-2"
-                                onClick={ async () => {
+                                onClick={async () => {
                                     let data = { "id": row.name }
                                     await sharedMutation(data);
-                                } }
+                                }}
                             />
                         </div>
                     ),
@@ -1227,9 +1229,9 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         fetchData();
-                                    } }
+                                    }}
                                     text="刷新"
                                     className="bg-teal border-0"
                                     icon="reload"
@@ -1239,11 +1241,11 @@
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    { linksError && (
+                    {linksError && (
                         <div className="text-center text-danger">
                             发生错误，请稍后重试！！！
                         </div>
-                    ) }
+                    )}
 
                     <Container fluid className="p-2">
                         <InputGroup className="mb-3">
@@ -1251,27 +1253,27 @@
                                 placeholder="关键词"
                                 aria-label="关键词"
                                 aria-describedby="关键词"
-                                onChange={ e => setKeyword(e.target.value) }
+                                onChange={e => setKeyword(e.target.value)}
                             />
-                            <Button variant="outline-secondary" id="button-addon2" onClick={ () => { handleSearchClick() } }>
+                            <Button variant="outline-secondary" id="button-addon2" onClick={() => { handleSearchClick() }}>
                                 搜索
                             </Button>
                         </InputGroup>
 
-                        { (linksLoading) && (
+                        {(linksLoading) && (
                             <Row>
-                                <Col xs={ 12 } className="py-2">
+                                <Col xs={12} className="py-2">
                                     <div className="text-center text-success">
                                         正在努力加载中......
                                     </div>
                                 </Col>
                             </Row>
-                        ) }
-                        { linksData && (
+                        )}
+                        {linksData && (
                             <Row>
-                                <DataTable data={ videos ? videos : [] } columns={ columns } />
+                                <DataTable data={videos ? videos : []} columns={columns} />
                             </Row>
-                        ) }
+                        )}
 
                     </Container>
                 </div>
@@ -1307,20 +1309,20 @@
                                 icon="redo"
                                 size="6"
                                 className="me-2"
-                                onClick={ async () => {
+                                onClick={async () => {
                                     let data = { "source": [{ "identity": row.identity }], "dest": { "path": "/" } }
                                     await recoverMutation(data);
-                                } }
+                                }}
                             />
 
                             <Icon
                                 icon="delete"
                                 size="6"
                                 className="me-2"
-                                onClick={ async () => {
+                                onClick={async () => {
                                     let data = { "id": row.path }
                                     await deleteMutation(data);
-                                } }
+                                }}
                             />
                         </div>
                     ),
@@ -1440,9 +1442,9 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         fetchData();
-                                    } }
+                                    }}
                                     text="刷新"
                                     className="bg-teal border-0"
                                     icon="reload"
@@ -1452,11 +1454,11 @@
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    { linksError && (
+                    {linksError && (
                         <div className="text-center text-danger">
                             发生错误，请稍后重试！！！
                         </div>
-                    ) }
+                    )}
 
                     <Container fluid className="p-2">
                         <InputGroup className="mb-3">
@@ -1464,27 +1466,27 @@
                                 placeholder="关键词"
                                 aria-label="关键词"
                                 aria-describedby="关键词"
-                                onChange={ e => setKeyword(e.target.value) }
+                                onChange={e => setKeyword(e.target.value)}
                             />
-                            <Button variant="outline-secondary" id="button-addon2" onClick={ () => { handleSearchClick() } }>
+                            <Button variant="outline-secondary" id="button-addon2" onClick={() => { handleSearchClick() }}>
                                 搜索
                             </Button>
                         </InputGroup>
 
-                        { (linksLoading) && (
+                        {(linksLoading) && (
                             <Row>
-                                <Col xs={ 12 } className="py-2">
+                                <Col xs={12} className="py-2">
                                     <div className="text-center text-success">
                                         正在努力加载中......
                                     </div>
                                 </Col>
                             </Row>
-                        ) }
-                        { linksData && (
+                        )}
+                        {linksData && (
                             <Row>
-                                <DataTable data={ videos ? videos : [] } columns={ columns } />
+                                <DataTable data={videos ? videos : []} columns={columns} />
                             </Row>
-                        ) }
+                        )}
 
                     </Container>
                 </div>
@@ -1512,10 +1514,10 @@
                             icon="cancel"
                             size="6"
                             className="me-2"
-                            onClick={ async () => {
+                            onClick={async () => {
                                 let data = { "id": row.identity }
                                 await deleteMutation(data);
-                            } }
+                            }}
                         />
                     ),
                 },
@@ -1604,9 +1606,9 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         fetchData();
-                                    } }
+                                    }}
                                     text="刷新"
                                     className="bg-teal border-0"
                                     icon="reload"
@@ -1616,27 +1618,27 @@
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    { linksError && (
+                    {linksError && (
                         <div className="text-center text-danger">
                             发生错误，请稍后重试！！！
                         </div>
-                    ) }
+                    )}
 
                     <Container fluid className="p-2">
-                        { (linksLoading) && (
+                        {(linksLoading) && (
                             <Row>
-                                <Col xs={ 12 } className="py-2">
+                                <Col xs={12} className="py-2">
                                     <div className="text-center text-success">
                                         正在努力加载中......
                                     </div>
                                 </Col>
                             </Row>
-                        ) }
-                        { linksData && (
+                        )}
+                        {linksData && (
                             <Row>
-                                <DataTable data={ videos ? videos : [] } columns={ columns } />
+                                <DataTable data={videos ? videos : []} columns={columns} />
                             </Row>
-                        ) }
+                        )}
 
                     </Container>
                 </div>
@@ -1670,10 +1672,10 @@
                             icon="cancel"
                             size="6"
                             className="me-2"
-                            onClick={ async () => {
+                            onClick={async () => {
                                 let data = { "id": row.identity }
                                 await deleteMutation(data);
-                            } }
+                            }}
                         />
                     ),
                 },
@@ -1768,9 +1770,9 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ () => {
+                                    onClick={() => {
                                         fetchData();
-                                    } }
+                                    }}
                                     text="刷新"
                                     className="bg-teal border-0"
                                     icon="reload"
@@ -1780,27 +1782,27 @@
                             </ButtonGroup>
                         </ButtonToolbar>
                     </div>
-                    { offlineTaskError && (
+                    {offlineTaskError && (
                         <div className="text-center text-danger">
                             发生错误，请稍后重试！！！
                         </div>
-                    ) }
+                    )}
 
                     <Container fluid className="p-2">
-                        { (offlineTaskLoading) && (
+                        {(offlineTaskLoading) && (
                             <Row>
-                                <Col xs={ 12 } className="py-2">
+                                <Col xs={12} className="py-2">
                                     <div className="text-center text-success">
                                         正在努力加载中......
                                     </div>
                                 </Col>
                             </Row>
-                        ) }
-                        { offlneTaskData && (
+                        )}
+                        {offlneTaskData && (
                             <Row>
-                                <DataTable data={ videos ? videos : [] } columns={ columns } />
+                                <DataTable data={videos ? videos : []} columns={columns} />
                             </Row>
-                        ) }
+                        )}
 
                     </Container>
                 </div>
@@ -1830,8 +1832,8 @@
                     dataIndex: "username",
                     render: (row) => (
                         <p>
-                            { row.username } <Button
-                                data-clipboard-text={ row.username }
+                            {row.username} <Button
+                                data-clipboard-text={row.username}
                                 className="bg-teal border-0 btn-sm copybtn">
                                 <Icon
                                     icon="content-copy"
@@ -1845,8 +1847,8 @@
                 {
                     title: "密码", dataIndex: "password", render: (row) => (
                         <p>
-                            { row.password } <Button
-                                data-clipboard-text={ row.password }
+                            {row.password} <Button
+                                data-clipboard-text={row.password}
                                 className="bg-teal border-0 btn-sm copybtn">
                                 <Icon
                                     icon="content-copy"
@@ -1860,9 +1862,9 @@
                 {
                     title: "操作", dataIndex: "user_identity", render: (row) => (
                         <IconButton
-                            onClick={ () => {
+                            onClick={() => {
                                 deleteWebdavMutation({ user_identity: row.user_identity, username: row.username, password: row.password });
-                            } }
+                            }}
                             className="bg-teal border-0"
                             icon="delete"
                             iconClassName="text-white"
@@ -1970,53 +1972,53 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
-                                    onClick={ handleShow }
+                                    onClick={handleShow}
                                     text="新建用户"
                                     className="bg-teal border-0"
                                     icon="plus"
                                     iconClassName="me-1 text-white"
                                     iconSize="6"
                                 />
-                                <Modal show={ show } onHide={ handleClose }>
+                                <Modal show={show} onHide={handleClose}>
                                     <Modal.Header closeButton>
                                         <Modal.Title>创建新用户</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
                                         <Form>
-                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextEmail">
+                                            <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
                                                 <Form.Label column sm="2">
                                                     用户名:
                                                 </Form.Label>
                                                 <Col sm="10">
-                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, username: e.target.value }) } } />
+                                                    <Form.Control type="text" defaultValue="" onChange={(e) => { setWebdav({ ...webdav, username: e.target.value }) }} />
                                                 </Col>
                                             </Form.Group>
 
-                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextPassword">
+                                            <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
                                                 <Form.Label column sm="2">
                                                     密码:
                                                 </Form.Label>
                                                 <Col sm="10">
-                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, password: e.target.value }) } } />
+                                                    <Form.Control type="text" defaultValue="" onChange={(e) => { setWebdav({ ...webdav, password: e.target.value }) }} />
                                                 </Col>
                                             </Form.Group>
 
-                                            <Form.Group as={ Row } className="mb-3" controlId="formPlaintextPassword">
+                                            <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
                                                 <Form.Label column sm="2">
                                                     目录:
                                                 </Form.Label>
                                                 <Col sm="10">
-                                                    <Form.Control type="text" defaultValue="" onChange={ (e) => { setWebdav({ ...webdav, root: e.target.value }) } } />
+                                                    <Form.Control type="text" defaultValue="" onChange={(e) => { setWebdav({ ...webdav, root: e.target.value }) }} />
                                                 </Col>
                                             </Form.Group>
 
                                         </Form>
                                     </Modal.Body>
                                     <Modal.Footer>
-                                        <Button variant="secondary" onClick={ handleClose }>
+                                        <Button variant="secondary" onClick={handleClose}>
                                             取消
                                         </Button>
-                                        <Button variant="primary" onClick={ onSave }>
+                                        <Button variant="primary" onClick={onSave}>
                                             保存
                                         </Button>
                                     </Modal.Footer>
@@ -2066,23 +2068,23 @@
 
                         </Form>
 
-                        { webdavError && (
+                        {webdavError && (
                             <div className="text-center text-danger">
                                 发生错误，请稍后重试！！！
                             </div>
-                        ) }
+                        )}
 
-                        { webdavLoading && (
+                        {webdavLoading && (
                             <div className="text-center text-success">
                                 正在努力加载中...
                             </div>
-                        ) }
+                        )}
 
-                        { webdavs && (
+                        {webdavs && (
                             <Row>
-                                <DataTable data={ webdavs ? webdavs : [] } columns={ columns } />
+                                <DataTable data={webdavs ? webdavs : []} columns={columns} />
                             </Row>
-                        ) }
+                        )}
 
 
                     </Container>
@@ -2132,11 +2134,11 @@
             return (
                 <div>
                     <Button
-                        style={ {
+                        style={{
                             backgroundColor: "transparent",
-                        } }
+                        }}
                         className="nav-link btn mr-1"
-                        onClick={ handleShow }
+                        onClick={handleShow}
                         children={
                             <span>
                                 <Icon
@@ -2147,7 +2149,7 @@
                             </span>
                         }
                     ></Button>
-                    <Modal show={ show } onHide={ handleClose }>
+                    <Modal show={show} onHide={handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>添加离线</Modal.Title>
                         </Modal.Header>
@@ -2161,18 +2163,18 @@
                                             label="磁力"
                                             name="offline_type"
                                             type="radio"
-                                            value={ 1 }
-                                            checked={ selectedOption == 1 }
-                                            onChange={ handleOptionChange }
+                                            value={1}
+                                            checked={selectedOption == 1}
+                                            onChange={handleOptionChange}
                                         />
                                         <Form.Check
                                             inline
                                             label="分享"
                                             name="offline_type"
                                             type="radio"
-                                            value={ 2 }
-                                            checked={ selectedOption == 2 }
-                                            onChange={ handleOptionChange }
+                                            value={2}
+                                            checked={selectedOption == 2}
+                                            onChange={handleOptionChange}
                                         />
                                     </div>
                                 </Form.Group>
@@ -2181,16 +2183,16 @@
                                     controlId="exampleForm.ControlTextarea1"
                                 >
                                     <Form.Label>链接地址</Form.Label>
-                                    <Form.Control as="textarea" value={ linkValue }
-                                        onChange={ handleLinkChange } rows={ 3 } />
+                                    <Form.Control as="textarea" value={linkValue}
+                                        onChange={handleLinkChange} rows={3} />
                                 </Form.Group>
                             </Form>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={ handleClose }>
+                            <Button variant="secondary" onClick={handleClose}>
                                 关闭
                             </Button>
-                            <Button variant="primary" onClick={ async () => {
+                            <Button variant="primary" onClick={async () => {
                                 var data = {};
                                 if (selectedOption == 1) {
                                     data = {
@@ -2211,7 +2213,7 @@
                                     }
                                 }
                                 await offlineMutation(data);
-                            } }>
+                            }}>
                                 保存
                             </Button>
                         </Modal.Footer>
@@ -2252,11 +2254,11 @@
             return (
                 <div>
                     <Button
-                        style={ {
+                        style={{
                             backgroundColor: "transparent",
-                        } }
+                        }}
                         className="nav-link btn"
-                        onClick={ handleShow }
+                        onClick={handleShow}
                         children={
                             <span>
                                 <Icon
@@ -2269,30 +2271,30 @@
                     ></Button>
 
 
-                    <Modal show={ show } onHide={ handleClose }>
+                    <Modal show={show} onHide={handleClose}>
                         <Modal.Header closeButton>
                             <Modal.Title>远程下载任务</Modal.Title>
                         </Modal.Header>
                         <Modal.Body className="py-0">
-                            { tasksError && (
+                            {tasksError && (
                                 <div className="text-center text-danger">
                                     发生错误，请稍后重试！！！
                                 </div>
-                            ) }
-                            { (tasksLoading) && (
+                            )}
+                            {(tasksLoading) && (
                                 <div className="text-center text-success">
                                     正在努力加载中......
                                 </div>
-                            ) }
+                            )}
                             <Container fluid className="p-2">
                                 <Row>
-                                    <Col xs={ 12 }>
-                                        <Paginate page={ pagination.pageIndex } onClick={ (i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) } } itemsPerPage="36" totalCount={ meta.filter_count } />
+                                    <Col xs={12}>
+                                        <Paginate page={pagination.pageIndex} onClick={(i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) }} itemsPerPage="36" totalCount={meta.filter_count} />
                                     </Col>
                                 </Row>
 
                                 <Row>
-                                    <Col xs={ 12 }>
+                                    <Col xs={12}>
                                         <Table bordered hover>
                                             <thead>
                                                 <tr>
@@ -2301,17 +2303,17 @@
                                                     <th>状态</th>
                                                 </tr>
                                             </thead>
-                                            { tasksData && (
+                                            {tasksData && (
                                                 <tbody>
-                                                    { tasks.map((task, index) => (
+                                                    {tasks.map((task, index) => (
                                                         <tr>
-                                                            <td>{ task.id }</td>
-                                                            <td>{ task.url.substr(task.url.indexOf('##') + 2) }</td>
-                                                            <td>{ task.status == 'draft' ? <span className="text-warning">待下载</span> : <span class="text-success">正在下载中</span> }</td>
+                                                            <td>{task.id}</td>
+                                                            <td>{task.url.substr(task.url.indexOf('##') + 2)}</td>
+                                                            <td>{task.status == 'draft' ? <span className="text-warning">待下载</span> : <span class="text-success">正在下载中</span>}</td>
                                                         </tr>
-                                                    )) }
+                                                    ))}
                                                 </tbody>
-                                            ) }
+                                            )}
 
                                         </Table>
 
@@ -2319,17 +2321,17 @@
                                 </Row>
 
                                 <Row>
-                                    <Col xs={ 12 } className="py-2">
-                                        <Paginate page={ pagination.pageIndex } onClick={ (i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) } } itemsPerPage="36" totalCount={ meta.filter_count } />
+                                    <Col xs={12} className="py-2">
+                                        <Paginate page={pagination.pageIndex} onClick={(i) => { onPaginationChange({ pageSize: 36, pageIndex: i }) }} itemsPerPage="36" totalCount={meta.filter_count} />
                                     </Col>
                                 </Row>
                             </Container>
                         </Modal.Body>
                         <Modal.Footer className="justify-content-between">
-                            <Button variant="primary" onClick={ () => { forceUpdate(); } }>
+                            <Button variant="primary" onClick={() => { forceUpdate(); }}>
                                 刷新
                             </Button>
-                            <Button variant="primary" onClick={ () => {
+                            <Button variant="primary" onClick={() => {
                                 const setting = STORE.getState().settings;
                                 showLoading();
                                 axios.post(setting.github_host, { "ref": "main", "inputs": {} }, {
@@ -2347,10 +2349,10 @@
                                     }).finally(() => {
                                         hideLoading();
                                     });
-                            } }>
+                            }}>
                                 开始下载
                             </Button>
-                            <Button variant="primary" onClick={ handleClose }>
+                            <Button variant="primary" onClick={handleClose}>
                                 关闭
                             </Button>
                         </Modal.Footer>
@@ -2378,7 +2380,7 @@
                                 icon="delete-outline"
                                 size="6"
                                 className="me-2"
-                                onClick={ () => {
+                                onClick={() => {
                                     layer.confirm('确定删除？该操作无法撤销!!!', { icon: 3 }, function (index) {
                                         setDownloads(
                                             downloads.filter(a =>
@@ -2389,11 +2391,11 @@
                                     }, function () {
 
                                     });
-                                } }
+                                }}
                             />
 
                             <Button
-                                data-clipboard-text={ row.url }
+                                data-clipboard-text={row.url}
                                 className="border-0 copybtn p-0 m-0 bg-transparent me-2">
                                 <Icon
                                     icon="content-copy"
@@ -2408,7 +2410,7 @@
                                 icon="pencil-outline"
                                 size="6"
                                 className="me-2"
-                                onClick={ () => {
+                                onClick={() => {
                                     layer.prompt({
                                         title: '输入文件名称，并确认',
                                         formType: 0,
@@ -2433,7 +2435,7 @@
                                         setDownloads(newDownloads);
                                         layer.close(index);
                                     });
-                                } }
+                                }}
                             />
                         </div>
                     ),
@@ -2498,11 +2500,11 @@
                 return (
                     <div>
                         <Button
-                            style={ {
+                            style={{
                                 backgroundColor: "transparent",
-                            } }
+                            }}
                             className="nav-link btn"
-                            onClick={ handleShow }
+                            onClick={handleShow}
                             children={
                                 <span>
                                     <Icon
@@ -2510,41 +2512,41 @@
                                         size="3"
                                         className="text-white"
                                     />
-                                    <Badge bg="danger" style={ { top: '-15px', left: '-10px' } }>{ downloads.length }</Badge>
+                                    <Badge bg="danger" style={{ top: '-15px', left: '-10px' }}>{downloads.length}</Badge>
                                 </span>
                             }
                         ></Button>
 
 
-                        <Modal show={ show } onHide={ handleClose }>
+                        <Modal show={show} onHide={handleClose}>
                             <Modal.Header closeButton>
                                 <Modal.Title>本地下载任务</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                { downloads && (
-                                    <DataTable data={ downloads ? downloads : [] } columns={ columns } />
-                                ) }
+                                {downloads && (
+                                    <DataTable data={downloads ? downloads : []} columns={columns} />
+                                )}
                             </Modal.Body>
                             <Modal.Footer className="justify-content-between">
 
                                 <ButtonGroup>
-                                    <Button variant="primary" onClick={ async () => { await localTaskdMutation() } }>
+                                    <Button variant="primary" onClick={async () => { await localTaskdMutation() }}>
                                         添加转存
                                     </Button>
                                 </ButtonGroup>
 
                                 <ButtonGroup>
-                                    <Button variant="danger" onClick={ () => {
+                                    <Button variant="danger" onClick={() => {
                                         layer.confirm('确定删除？该操作无法撤销!!!', { icon: 3 }, function (index) {
                                             setDownloads([]);
                                             layer.close(index);
                                         }, function () {
 
                                         });
-                                    } }>
+                                    }}>
                                         清空
                                     </Button>
-                                    <Button variant="primary" onClick={ handleClose }>
+                                    <Button variant="primary" onClick={handleClose}>
                                         关闭
                                     </Button>
                                 </ButtonGroup>
@@ -2562,17 +2564,17 @@
         const container = document.getElementById("root");
         const root = ReactDOM.createRoot(container);
         root.render(
-            <QueryClientProvider client={ queryClient }>
+            <QueryClientProvider client={queryClient}>
                 <HashRouter>
                     <Route path="/:path?">
                         <Layout>
                             <Switch>
-                                <Route path="/" exact component={ Videos } />
-                                <Route path="/shares" exact component={ Shares } />
-                                <Route path="/trash" exact component={ Trash } />
-                                <Route path="/webdav" exact component={ WebDav } />
-                                <Route path="/offlinetask" exact component={ OfflineTask } />
-                                <Route path="/videos/*" component={ Videos } />
+                                <Route path="/" exact component={Videos} />
+                                <Route path="/shares" exact component={Shares} />
+                                <Route path="/trash" exact component={Trash} />
+                                <Route path="/webdav" exact component={WebDav} />
+                                <Route path="/offlinetask" exact component={OfflineTask} />
+                                <Route path="/videos/*" component={Videos} />
                             </Switch>
                         </Layout>
                     </Route>
