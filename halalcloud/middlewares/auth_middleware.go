@@ -45,20 +45,9 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("authService", serv)
-		// println(serv.GetAuth())
-
-		// userJson, err := json.Marshal(serv.GetAuth())
-		// if err != nil {
-		// 	c.JSON(http.StatusInternalServerError, gin.H{
-		// 		"message": "无法获取用户信息",
-		// 	})
-		// 	c.Abort()
-		// 	return
-		// }
 
 		//client := pubUserFile.NewPubUserFileClient(serv.GetGrpcConnection())
 		//c.Set("userClient", client)
-
 		c.Next()
 	}
 }

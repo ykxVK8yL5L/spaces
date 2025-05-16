@@ -49,7 +49,10 @@ func EnableFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func DisableFtp(c *gin.Context) {
@@ -90,7 +93,10 @@ func DisableFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func GetFtp(c *gin.Context) {
@@ -131,7 +137,10 @@ func GetFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func UpdateFtp(c *gin.Context) {
@@ -172,7 +181,10 @@ func UpdateFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func UpdateKeysFtp(c *gin.Context) {
@@ -213,7 +225,10 @@ func UpdateKeysFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func ValidateUserNameFtp(c *gin.Context) {
@@ -254,5 +269,8 @@ func ValidateUserNameFtp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }

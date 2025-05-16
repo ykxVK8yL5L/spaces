@@ -25,7 +25,6 @@ func ListFiles(c *gin.Context) {
 		return
 	}
 	client := pubUserFile.NewPubUserFileClient(fserv.GetGrpcConnection())
-
 	var fileRequestBody pubUserFile.FileListRequest
 
 	// 从请求体中解析 JSON 到 requestBody 结构体
@@ -40,6 +39,7 @@ func ListFiles(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	result, err := client.List(ctx, &fileRequestBody)
+
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -48,7 +48,10 @@ func ListFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func ListTrashFiles(c *gin.Context) {
@@ -88,7 +91,10 @@ func ListTrashFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func GetFile(c *gin.Context) {
@@ -128,7 +134,10 @@ func GetFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func SearchFiles(c *gin.Context) {
@@ -168,7 +177,10 @@ func SearchFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func CreateFolderFile(c *gin.Context) {
@@ -208,7 +220,10 @@ func CreateFolderFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func MoveFiles(c *gin.Context) {
@@ -248,7 +263,10 @@ func MoveFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func CopyFiles(c *gin.Context) {
@@ -288,7 +306,10 @@ func CopyFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func TrashFiles(c *gin.Context) {
@@ -328,7 +349,10 @@ func TrashFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func DeleteFiles(c *gin.Context) {
@@ -368,7 +392,10 @@ func DeleteFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func RenameFiles(c *gin.Context) {
@@ -408,7 +435,10 @@ func RenameFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func BatchRenameFiles(c *gin.Context) {
@@ -448,7 +478,10 @@ func BatchRenameFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func RecoverFiles(c *gin.Context) {
@@ -488,7 +521,10 @@ func RecoverFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func DeleteTrashFiles(c *gin.Context) {
@@ -528,7 +564,10 @@ func DeleteTrashFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func ParseFileSliceFiles(c *gin.Context) {
@@ -568,7 +607,10 @@ func ParseFileSliceFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func GetSliceDownloadAddressFiles(c *gin.Context) {
@@ -608,5 +650,8 @@ func GetSliceDownloadAddressFiles(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }

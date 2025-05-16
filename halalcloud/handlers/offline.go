@@ -50,7 +50,10 @@ func ListOfflines(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func AddOffline(c *gin.Context) {
@@ -92,7 +95,10 @@ func AddOffline(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func ParseOffline(c *gin.Context) {
@@ -134,7 +140,10 @@ func ParseOffline(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func DeleteOffline(c *gin.Context) {
@@ -176,5 +185,8 @@ func DeleteOffline(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }

@@ -50,7 +50,10 @@ func ListShares(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func CreateShare(c *gin.Context) {
@@ -92,7 +95,10 @@ func CreateShare(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func DeleteShare(c *gin.Context) {
@@ -133,7 +139,10 @@ func DeleteShare(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func GetShare(c *gin.Context) {
@@ -174,7 +183,10 @@ func GetShare(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func SaveShare(c *gin.Context) {
@@ -215,5 +227,8 @@ func SaveShare(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }

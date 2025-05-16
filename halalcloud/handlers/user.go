@@ -50,7 +50,10 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func UpdateUser(c *gin.Context) {
@@ -92,7 +95,10 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func ChangePassword(c *gin.Context) {
@@ -133,7 +139,10 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func RefreshUserAccessToken(c *gin.Context) {
@@ -174,7 +183,10 @@ func RefreshUserAccessToken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 
 func QuotoUser(c *gin.Context) {
@@ -215,7 +227,10 @@ func QuotoUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }
 func LogoffUser(c *gin.Context) {
 	serv, exists := c.Get("authService")
@@ -255,5 +270,8 @@ func LogoffUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":    result,
+		"auth_info": fserv.GetAuth(),
+	})
 }

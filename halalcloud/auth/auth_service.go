@@ -183,6 +183,7 @@ func NewAuthService(appID, appVersion, appSecret, refreshToken string, accessTok
 	}
 
 	svc.grpcConnection = grpcConnection
+
 	/*
 		testCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()

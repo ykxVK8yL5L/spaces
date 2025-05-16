@@ -23,6 +23,9 @@ func main() {
 		// 返回 HTML 文件的内容
 		c.Data(http.StatusOK, "text/html", data)
 	})
+	// r.GET("/", func(c *gin.Context) {
+	// 	c.File("templates/index.html")
+	// })
 	r.GET("/login", handlers.Login)
 	routes.SetupRoutes(r)
 	r.Run(":8080")

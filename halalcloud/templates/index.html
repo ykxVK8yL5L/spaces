@@ -263,6 +263,43 @@
         // settingStorage.getItem('category', function (err, value) {
         // 	console.log(value.name);
         // });
+        axios.interceptors.request.use(
+            async function (config) {
+                if (!config.url.includes('/api/login')) {
+                    const value = await settingStorage.getItem('auth_info');
+                    if (value.hasOwnProperty('access_token')) {
+                        config.headers['Refresh-Token'] = `${ value.refresh_token }`;
+                        config.headers['Access-Token'] = `${ value.access_token }`;
+                        config.headers['Access-Token-Expired-At'] = `${ value.expire_at }`;
+                    } else {
+                        config.headers['Refresh-Token'] = `${ value.refresh_token }`;
+                        config.headers['Access-Token'] = "";
+                        config.headers['Access-Token-Expired-At'] = 0;
+                    }
+                }
+                return config;
+            },
+            function (error) {
+                // 请求错误处理
+                return Promise.reject(error);
+            }
+        );
+        axios.interceptors.response.use(
+            function (response) {
+                // 如果返回的结果中有 auth_info 字段
+                if (response.data && response.data.auth_info) {
+                    settingStorage.setItem('auth_info', response.data.auth_info)
+                }
+                // 返回响应数据
+                return response;
+            },
+            function (error) {
+                // 错误处理
+                console.error('Response Error:', error);
+                return Promise.reject(error);
+            }
+        );
+
 
 
         const { createStore, combineReducers } = Redux;
@@ -596,6 +633,7 @@
                 }
             }
             const saveSetting = () => {
+                settingStorage.setItem('auth_info', { "refresh_token": setting.refresh_token })
                 STORE.dispatch({ type: 'SAVE_SETTING', payload: setting })
             }
             return (
@@ -1074,12 +1112,7 @@
                     var fiel_path = path + '/' + fileinfo.id;
                     var url = '/api/share/create';
                     var data = { "path_list": [fiel_path], "lifetime": -1 }
-                    return await axios.post(url, data, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, data)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1095,11 +1128,7 @@
                     var fiel_path = path + '/' + fileinfo.id;
                     var data = { source: [{ path: fiel_path }] }
                     return await axios.delete(fileinfo.url, {
-                        data: data,
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
+                        data: data
                     })
                 },
                 onSuccess: async (data, variables, context) => {
@@ -1114,18 +1143,8 @@
                 mutationKey: ["get-files"],
                 mutationFn: async (data) => {
                     showLoading();
-                    let config = {
-                        method: 'post',
-                        maxBodyLength: Infinity,
-                        url: '/api/file/list',
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                        data: data
-                    };
                     var url = '/api/file/list';
-                    return await axios.request(config)
+                    return await axios.post(url, data)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1167,9 +1186,9 @@
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.list_info.token)
-                    if (linksData.data.hasOwnProperty('files')) {
-                        setVideos([...linksData.data.files])
+                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.hasOwnProperty('files')) {
+                        setVideos([...linksData.data.result.files])
                     }
                 }
             }, [linksData]);
@@ -1185,7 +1204,7 @@
 
             useEffect(() => {
                 if (shareData) {
-                    layer.alert(shareData.data.identity);
+                    layer.alert(shareData.data.result.identity);
                 }
             }, [shareData]);
 
@@ -1314,12 +1333,7 @@
                 mutationFn: async (fileinfo) => {
                     showLoading();
                     var url = '/api/file/recover';
-                    return await axios.post(url, fileinfo, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, fileinfo)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1335,11 +1349,7 @@
                     var url = '/api/file/deletetrash';
                     var data = { source: [{ path: fileinfo.id }] }
                     return await axios.delete(url, {
-                        data: data,
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
+                        data: data
                     })
                 },
                 onSuccess: async (data, variables, context) => {
@@ -1354,18 +1364,8 @@
                 mutationKey: ["get-trash-files"],
                 mutationFn: async (data) => {
                     showLoading();
-                    let config = {
-                        method: 'post',
-                        maxBodyLength: Infinity,
-                        url: '/api/file/listtrash',
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                        data: data
-                    };
-                    var url = '/api/file/list';
-                    return await axios.request(config)
+                    var url = '/api/file/listtrash';
+                    return await axios.post(url, data)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1398,9 +1398,9 @@
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.list_info.token)
-                    if (linksData.data.hasOwnProperty('files')) {
-                        setVideos([...linksData.data.files])
+                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.hasOwnProperty('files')) {
+                        setVideos([...linksData.data.result.files])
                     }
                 }
             }, [linksData]);
@@ -1529,15 +1529,10 @@
                     var data = { identity: [fileinfo.id] }
                     return await axios.delete(url, {
                         data: data,
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
                     })
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
-                    forceUpdate();
                 },
                 onError: () => {
                     hideLoading();
@@ -1548,12 +1543,7 @@
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/api/share/list';
-                    return await axios.post(url, query, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, query)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1584,9 +1574,9 @@
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.list_info.token)
-                    if (linksData.data.hasOwnProperty('shares')) {
-                        setVideos([...linksData.data.shares])
+                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.hasOwnProperty('shares')) {
+                        setVideos([...linksData.data.result.shares])
                     }
                 }
             }, [linksData]);
@@ -1697,10 +1687,6 @@
                     var data = { identity: [fileinfo.id] }
                     return await axios.delete(url, {
                         data: data,
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
                     })
                 },
                 onSuccess: async (data, variables, context) => {
@@ -1716,12 +1702,7 @@
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/api/offline/list';
-                    return await axios.post(url, query, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, query)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1753,9 +1734,9 @@
 
             useEffect(() => {
                 if (offlneTaskData) {
-                    setPageToken(offlneTaskData.data.list_info.token)
-                    if (offlneTaskData.data.hasOwnProperty('tasks')) {
-                        setVideos([...offlneTaskData.data.tasks])
+                    setPageToken(offlneTaskData.data.result.list_info.token)
+                    if (offlneTaskData.data.result.hasOwnProperty('tasks')) {
+                        setVideos([...offlneTaskData.data.result.tasks])
                     }
 
                 }
@@ -1834,12 +1815,7 @@
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/api/webdav/listall';
-                    return await axios.post(url, query, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, query)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1913,8 +1889,8 @@
 
             useEffect(() => {
                 if (webdavData) {
-                    if (webdavData.data.hasOwnProperty('configs')) {
-                        setWebdavs([...webdavData.data.configs])
+                    if (webdavData.data.result.hasOwnProperty('configs')) {
+                        setWebdavs([...webdavData.data.result.configs])
                     }
                 }
             }, [webdavData]);
@@ -1925,12 +1901,7 @@
                 mutationFn: async (query) => {
                     showLoading();
                     var url = '/api/webdav/create';
-                    return await axios.post(url, query, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, query)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1946,11 +1917,7 @@
                     showLoading();
                     var url = '/api/webdav/delete';
                     return await axios.delete(url, {
-                        data: query,
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
+                        data: query
                     })
                 },
                 onSuccess: async (data, variables, context) => {
@@ -1978,7 +1945,7 @@
 
             useEffect(() => {
                 if (addWebdavData) {
-                    if (addWebdavData.data.hasOwnProperty('user_identity')) {
+                    if (addWebdavData.data.result.hasOwnProperty('user_identity')) {
                         handleClose()
                         webdavMutation({})
                     }
@@ -1987,7 +1954,7 @@
 
             useEffect(() => {
                 if (deleteWebdavData) {
-                    if (deleteWebdavData.data.hasOwnProperty('user_identity')) {
+                    if (deleteWebdavData.data.result.hasOwnProperty('user_identity')) {
                         webdavMutation({})
                     }
                 }
@@ -2145,12 +2112,7 @@
                 mutationFn: async (query) => {
                     showLoading();
                     var url = query.url;
-                    return await axios.post(url, query.data, {
-                        headers: {
-                            'Refresh-Token': authorization,
-                            'Content-Type': 'application/json'
-                        },
-                    })
+                    return await axios.post(url, query.data)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
