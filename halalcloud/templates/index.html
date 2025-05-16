@@ -1081,7 +1081,7 @@
                                         className="me-2"
                                         onClick={async () => {
                                             if (webdav.username !== undefined && webdav.username !== null) {
-                                                row.url = `https://${webdav.username}:${webdav.password}@dav.2dland.cn/${path}/${row.name}`
+                                                row.url = `https://${webdav.username}:${webdav.password}@dav.2dland.cn${path}/${row.name}`
                                                 emitEvent("addDownload", row)
                                             } else {
                                                 layer.alert("请先设置WebDav信息!!!", { icon: 5 });
