@@ -279,6 +279,9 @@
                         }
                     }
                 }
+                if (!config.headers['Content-Type']) {
+                    config.headers['Content-Type'] = 'application/json';
+                }
                 return config;
             },
             function (error) {
@@ -335,6 +338,8 @@
             switch (action.type) {
                 case 'SAVE_SETTING':
                     return { ...state, ...action.payload };
+                case 'RESET_SETTING':
+                    return {};
                 default:
                     return state;
             }
@@ -682,10 +687,7 @@
         //分页结束
 
         const paginateLinksGet = async (page_token, keyword) => {
-            //const url = `/files?size=${limit}&page=${page}&kw=${keyword}`;
-            console.log("======fuck========");
             const url = `/files`;
-
             const { data } = await axios.post(url,
                 {
                     "size": 100,
@@ -735,14 +737,21 @@
                 enabled: false,
             })
 
-            const { data: logoutData, refetch: logoutRefetch, isLoading: logoutLoading, error: logoutError } = useQuery({
-                queryKey: ['logout'],
-                queryFn: async () => {
+            const { data: logoutData, error: logoutError, mutateAsync: logoutMutation } = useMutation({
+                mutationKey: ["create_share"],
+                mutationFn: async () => {
                     var url = '/api/user/logoff';
                     return await axios.post(url, { "refresh_token": globalSetting.refresh_token })
                 },
-                enabled: false,
+                onSuccess: async (data, variables, context) => {
+                    hideLoading();
+                },
+                onError: () => {
+                    hideLoading();
+                }
             })
+
+
 
             const [showLogin, setShowLogin] = useState(false);
             const globalSetting = STORE.getState().settings;
@@ -754,18 +763,21 @@
                 }
             }, []);
 
-
             useEffect(() => {
                 if (logoutData) {
                     settingStorage.setItem('auth_info', {})
                     settingStorage.setItem('webdavs', {})
                     settingStorage.setItem('downloads', [])
-                    STORE.dispatch({ type: 'SAVE_SETTING', payload: {} })
+                    STORE.dispatch({ type: 'RESET_SETTING', payload: {} })
+                    window.location.reload()
                 }
             }, [logoutData]);
 
-
-
+            useEffect(() => {
+                if (logoutError) {
+                    layer.alert("退出发生错误,请检查Refresh Token是否正确", { icon: 5 });
+                }
+            }, [logoutError]);
 
             const [showSideBar, setShowSideBar] = useState(false);
             const handleSidebarClose = () => setShowSideBar(false);
@@ -773,7 +785,6 @@
             const toggleSidebarShow = () => {
                 setShowSideBar(!showSideBar);
             };
-
             const [setting, setSetting] = useState(false);
 
             return (
@@ -837,7 +848,12 @@
                                         className="nav-link btn"
                                         onClick={() => {
                                             if (globalSetting && globalSetting.refresh_token && globalSetting.refresh_token.length > 5) {
-                                                logoutRefetch()
+                                                layer.confirm('确定退出？该操作无法撤销!!!', { icon: 3 }, function (index) {
+                                                    logoutMutation();
+                                                    layer.close(index);
+                                                }, function () {
+
+                                                });
                                             } else {
                                                 layer.alert("Rfresh Token不能为空!!!", { icon: 5 });
                                             }
@@ -1046,11 +1062,18 @@
             const [videos, setVideos] = useState([])
             const [webdav, setWebdav] = useState({})
             const setting = STORE.getState().settings;
+            const location = useLocation();
+            var path = "/"
 
-            var path = location.hash.replace('#/videos', '').replace(/^\/+/, '') || '';
-            if (path === '#/') {
-                path = ''; // 处理为根目录，即 /videos 下的内容
-            }
+            useEffect(() => {
+                if (!setting.refresh_token || setting.refresh_token.length < 5) {
+                    layer.alert("请先正确配置刷新令牌", { icon: 5 });
+                    return
+                }
+                setVideos([])
+                setPageToken("")
+                filesMutation()
+            }, [location]);
 
 
             const columns = [
@@ -1066,7 +1089,7 @@
                                 row.dir ? (<Nav.Link
                                     as={Link}
                                     className="nav-link text-dark"
-                                    to={`/videos/${path}/${row.name}`}
+                                    to={`/videos${row.path}`}
                                     target="_blank"
                                 >
                                     <Icon
@@ -1163,8 +1186,23 @@
             })
             const { data: linksData, mutateAsync: filesMutation, error: linksError, isPending: linksLoading } = useMutation({
                 mutationKey: ["get-files"],
-                mutationFn: async (data) => {
+                mutationFn: async () => {
                     showLoading();
+                    if (location.pathname.startsWith("/videos/")) {
+                        path = location.pathname.slice(7)
+                    } else {
+                        path = "/"
+                    }
+                    let data = {
+                        "parent": {
+                            "path": path
+                        },
+                        "filter": {},
+                        "list_info": {
+                            "limit": limit,
+                            "token": pageToken
+                        }
+                    };
                     var url = '/api/file/list';
                     return await axios.post(url, data)
                 },
@@ -1176,23 +1214,6 @@
                 }
             })
 
-            const fetchData = () => {
-                if (!setting.refresh_token || setting.refresh_token.length < 5) {
-                    layer.alert("请先正确配置刷新令牌", { icon: 5 });
-                    return
-                }
-                let data = JSON.stringify({
-                    "parent": {
-                        "path": path
-                    },
-                    "filter": {},
-                    "listInfo": {
-                        "limit": limit,
-                        "token": pageToken
-                    }
-                });
-                filesMutation(data);
-            }
 
             useEffect(() => {
                 settingStorage.getItem('webdavs').then(function (value) {
@@ -1202,15 +1223,18 @@
                 }).catch(function (err) {
                     console.log(err)
                 });
-                fetchData()
             }, []);
 
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.list_info.token) {
+                        setPageToken(linksData.data.result.list_info.token)
+                    } else {
+                        setPageToken("")
+                    }
                     if (linksData.data.result.hasOwnProperty('files')) {
-                        setVideos([...linksData.data.result.files])
+                        setVideos([...videos, ...linksData.data.result.files])
                     }
                 }
             }, [linksData]);
@@ -1220,7 +1244,7 @@
                 if (deleteData) {
                     layer.msg("删除完成，请刷新查看结果");
                     setPageToken("")
-                    fetchData()
+                    filesMutation();
                 }
             }, [deleteData]);
 
@@ -1292,6 +1316,14 @@
                         {linksData && (
                             <Row>
                                 <DataTable data={videos ? videos : []} columns={columns} />
+                            </Row>
+                        )}
+
+                        {pageToken.length > 5 && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <Button variant="primary" onClick={() => { filesMutation() }}>更多</Button>
+                                </Col>
                             </Row>
                         )}
 
@@ -1398,18 +1430,17 @@
             })
 
             const fetchData = () => {
-                setVideos([])
                 if (!setting.refresh_token || setting.refresh_token.length < 5) {
                     layer.alert("请先正确配置刷新令牌", { icon: 5 });
                     return
                 }
-                let data = JSON.stringify({
+                let data = {
                     "filter": {},
-                    "listInfo": {
+                    "list_info": {
                         "limit": limit,
                         "token": pageToken
                     }
-                });
+                };
                 filesMutation(data);
             }
 
@@ -1420,9 +1451,13 @@
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.list_info.token) {
+                        setPageToken(linksData.data.result.list_info.token)
+                    } else {
+                        setPageToken("")
+                    }
                     if (linksData.data.result.hasOwnProperty('files')) {
-                        setVideos([...linksData.data.result.files])
+                        setVideos([...videos, ...linksData.data.result.files])
                     }
                 }
             }, [linksData]);
@@ -1432,6 +1467,7 @@
                 if (deleteData) {
                     layer.msg("删除完成，请刷新查看结果");
                     setPageToken("")
+                    setVideos([])
                     fetchData()
                 }
             }, [deleteData]);
@@ -1440,6 +1476,7 @@
                 if (recoverData) {
                     layer.msg("操作完成，请刷新查看结果");
                     setPageToken("")
+                    setVideos([]);
                     fetchData()
                 }
             }, [recoverData]);
@@ -1505,6 +1542,14 @@
                         {linksData && (
                             <Row>
                                 <DataTable data={videos ? videos : []} columns={columns} />
+                            </Row>
+                        )}
+
+                        {pageToken.length > 5 && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <Button variant="primary" onClick={() => { fetchData() }}>更多</Button>
+                                </Col>
                             </Row>
                         )}
 
@@ -1577,7 +1622,6 @@
 
 
             const fetchData = () => {
-                setVideos([])
                 if (!setting.refresh_token || setting.refresh_token.length < 5) {
                     layer.alert("请先正确配置刷新令牌", { icon: 5 });
                     return
@@ -1596,9 +1640,13 @@
 
             useEffect(() => {
                 if (linksData) {
-                    setPageToken(linksData.data.result.list_info.token)
+                    if (linksData.data.result.list_info.token) {
+                        setPageToken(linksData.data.result.list_info.token)
+                    } else {
+                        setPageToken("")
+                    }
                     if (linksData.data.result.hasOwnProperty('shares')) {
-                        setVideos([...linksData.data.result.shares])
+                        setVideos([...videos, ...linksData.data.result.shares])
                     }
                 }
             }, [linksData]);
@@ -1657,6 +1705,13 @@
                         {linksData && (
                             <Row>
                                 <DataTable data={videos ? videos : []} columns={columns} />
+                            </Row>
+                        )}
+                        {pageToken.length > 5 && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <Button variant="primary" onClick={() => { fetchData() }}>更多</Button>
+                                </Col>
                             </Row>
                         )}
 
@@ -1736,7 +1791,6 @@
 
 
             const fetchData = () => {
-                setVideos([])
                 if (!setting.refresh_token || setting.refresh_token.length < 5) {
                     layer.alert("请先正确配置刷新令牌", { icon: 5 });
                     return
@@ -1756,9 +1810,13 @@
 
             useEffect(() => {
                 if (offlneTaskData) {
-                    setPageToken(offlneTaskData.data.result.list_info.token)
+                    if (offlneTaskData.data.result.list_info.token) {
+                        setPageToken(offlneTaskData.data.result.list_info.token)
+                    } else {
+                        setPageToken("")
+                    }
                     if (offlneTaskData.data.result.hasOwnProperty('tasks')) {
-                        setVideos([...offlneTaskData.data.result.tasks])
+                        setVideos([...videos, ...offlneTaskData.data.result.tasks])
                     }
 
                 }
@@ -1823,6 +1881,15 @@
                                 <DataTable data={videos ? videos : []} columns={columns} />
                             </Row>
                         )}
+
+                        {pageToken.length > 5 && (
+                            <Row>
+                                <Col xs={12} className="py-2">
+                                    <Button variant="primary" onClick={() => { fetchData() }}>更多</Button>
+                                </Col>
+                            </Row>
+                        )}
+
 
                     </Container>
                 </div>
