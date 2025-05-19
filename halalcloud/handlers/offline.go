@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"halalcloud/auth"
 	"net/http"
+	"strings"
 	"time"
 
 	pubUserOffline "github.com/city404/v6-public-rpc-proto/go/v6/offline"
@@ -71,10 +72,13 @@ func AddOffline(c *gin.Context) {
 		return
 	}
 
-	var addOfflineRequestBody pubUserOffline.UserTask
-
-	// 从请求体中解析 JSON 到 requestBody 结构体
-	if err := c.ShouldBindJSON(&addOfflineRequestBody); err != nil {
+	// 获取请求体中的字符串数据
+	var requestBody struct {
+		Url      string `json:"url"`
+		SavePath string `json:"save_path"`
+	}
+	// 从请求体中解析 JSON 到结构体
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		// 如果绑定失败，返回 400 错误
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "无效的请求数据",
@@ -82,21 +86,47 @@ func AddOffline(c *gin.Context) {
 		return
 	}
 
+	// 按换行符拆分字符串，得到多个任务
+	tasks := strings.Split(requestBody.Url, "\n")
+	// 输出拆分后的任务数据，进行调试
+	fmt.Println("Tasks received:")
+	for i, task := range tasks {
+		fmt.Printf("Task %d: %s\n", i+1, task)
+	}
+
 	client := pubUserOffline.NewPubOfflineTaskClient(fserv.GetGrpcConnection())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
-	result, err := client.Add(ctx, &addOfflineRequestBody)
 
-	if err != nil {
-		fmt.Println(err)
+	var results []interface{}
+	var errors []string
+
+	// 遍历每个任务，依次执行 Add
+	for _, task := range tasks {
+		// 创建一个 UserTask 对象并解析任务数据
+		var addOfflineRequestBody pubUserOffline.UserTask
+		addOfflineRequestBody.Url = task
+		addOfflineRequestBody.SavePath = requestBody.SavePath
+
+		// 执行 Add 操作
+		result, err := client.Add(ctx, &addOfflineRequestBody)
+		if err != nil {
+			errors = append(errors, err.Error())
+		} else {
+			results = append(results, result)
+		}
+	}
+
+	// 如果有错误，则返回错误信息
+	if len(errors) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"error": strings.Join(errors, "\n"),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"result":    result,
+		"result":    results,
 		"auth_info": fserv.GetAuth(),
 	})
 }
