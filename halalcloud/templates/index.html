@@ -1722,11 +1722,13 @@
 
         const OfflineTask = () => {
             const [reload, setReload] = useState(false);
+            const [isAllSelected, setIsAllSelected] = useState(false);
             const [pageToken, setPageToken] = useState('');
             const [limit, setLimit] = useState(20);
             const [keyword, setKeyword] = useState("")
             const [search, setSearch] = useState("")
             const [videos, setVideos] = useState([])
+            const [selectedTasks, setSelectedTasks] = useState([]);
             const setting = STORE.getState().settings;
             const statusToString = {
                 10: "等待下载",
@@ -1734,7 +1736,31 @@
                 110: "下载中",
                 1000: "下载完成",
             };
+            // 处理全选复选框
+            const handleSelectAllChange = (event) => {
+                if (event.target.checked) {
+                    // 全选：将所有选项的 id 添加到 selectedOptions 中
+                    setSelectedTasks(videos.map(option => option.identity));
+                } else {
+                    // 取消全选：清空选中的选项
+                    setSelectedTasks([]);
+                }
+            };
+
             const columns = [
+                {
+                    title: (<input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={handleSelectAllChange}
+                    />), dataIndex: "identity", render: (row) => (
+                        <input
+                            type="checkbox"
+                            checked={selectedTasks.includes(row.identity)}
+                            onChange={(e) => handleCheckboxChange(e, row.identity)}
+                        />
+                    )
+                },
                 { title: "文件名称", dataIndex: "name" },
                 { title: "状态", dataIndex: "status", render: (row) => (row.progress ? statusToString[row.status] + '进度:' + row.progress : statusToString[row.status]) },
                 { title: "创建时间", dataIndex: "create_ts", render: (row) => (formatDate(row.create_ts)) },
@@ -1748,7 +1774,7 @@
                             size="6"
                             className="me-2"
                             onClick={async () => {
-                                let data = { "id": row.identity }
+                                let data = { "ids": [row.identity] }
                                 await deleteMutation(data);
                             }}
                         />
@@ -1761,7 +1787,7 @@
                 mutationFn: async (fileinfo) => {
                     showLoading();
                     var url = '/api/offline/delete';
-                    var data = { identity: [fileinfo.id] }
+                    var data = { identity: fileinfo.ids }
                     return await axios.delete(url, {
                         data: data,
                     })
@@ -1801,11 +1827,24 @@
                 offlineTaskMutation(data);
             }
 
-
+            // 处理勾选或取消勾选
+            const handleCheckboxChange = (event, optionId) => {
+                if (event.target.checked) {
+                    // 如果被勾选，则将该选项添加到 selectedTasks 中
+                    setSelectedTasks(prevState => [...prevState, optionId]);
+                } else {
+                    // 如果取消勾选，则从 selectedTasks 中移除该选项
+                    setSelectedTasks(prevState => prevState.filter(id => id !== optionId));
+                }
+            };
 
             useEffect(() => {
                 fetchData()
             }, []);
+
+            useEffect(() => {
+                setIsAllSelected(videos.length > 0 && selectedTasks.length === videos.length);
+            }, [selectedTasks]);
 
 
             useEffect(() => {
@@ -1846,6 +1885,20 @@
                             aria-label="离线任务列表"
                             className="bg-teal rounded"
                         >
+                            <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={async () => {
+                                        let data = { "ids": selectedTasks }
+                                        await deleteMutation(data);
+                                    }}
+                                    text="清理记录"
+                                    className="bg-teal border-0"
+                                    icon="delete-outline"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                            </ButtonGroup>
+
                             <ButtonGroup className="bg-teal">
                                 <IconButton
                                     onClick={() => {
