@@ -1903,8 +1903,11 @@
                 mutationKey: ["get_offflinetask_list", pageToken],
                 mutationFn: async (query) => {
                     showLoading();
+                    let data = {
+                        "list_info": { "limit": limit, "token": pageToken },
+                    }
                     var url = '/api/offline/list';
-                    return await axios.post(url, query)
+                    return await axios.post(url, data)
                 },
                 onSuccess: async (data, variables, context) => {
                     hideLoading();
@@ -1914,16 +1917,12 @@
                 }
             })
 
-
             const fetchData = () => {
                 if (!setting.refresh_token || setting.refresh_token.length < 5) {
                     layer.alert("请先正确配置刷新令牌", { icon: 5 });
                     return
                 }
-                let data = {
-                    "list_info": { "limit": limit, "token": pageToken },
-                }
-                offlineTaskMutation(data);
+                offlineTaskMutation({});
             }
 
             // 处理勾选或取消勾选
@@ -1964,9 +1963,6 @@
                 if (deleteShareData) {
                     layer.msg("刷新完成，刷新查看");
                     setVideos([])
-                    let data = {
-                        "list_info": { "limit": limit, "token": "" },
-                    }
                     setPageToken("")
                     fetchData()
                 }
