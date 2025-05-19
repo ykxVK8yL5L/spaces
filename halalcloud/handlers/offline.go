@@ -88,11 +88,6 @@ func AddOffline(c *gin.Context) {
 
 	// 按换行符拆分字符串，得到多个任务
 	tasks := strings.Split(requestBody.Url, "\n")
-	// 输出拆分后的任务数据，进行调试
-	fmt.Println("Tasks received:")
-	for i, task := range tasks {
-		fmt.Printf("Task %d: %s\n", i+1, task)
-	}
 
 	client := pubUserOffline.NewPubOfflineTaskClient(fserv.GetGrpcConnection())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
