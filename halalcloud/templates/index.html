@@ -1318,31 +1318,36 @@
                             <ButtonGroup className="bg-teal">
                                 <IconButton
                                     onClick={async () => {
-                                        layer.open({
-                                            type: 1,
-                                            title: '直接删除将不会把文件放到回收站!!!!',
-                                            btn: ['回收站', '直接删除'],
-                                            yes: async function (index, layero) {
-                                                const files = selectedVideos.map(value => {
-                                                    return {
-                                                        identity: value,
-                                                    };
-                                                });
-                                                let data = { "ids": files, url: "/api/file/trash" }
-                                                await deleteMutation(data);
-                                                layer.close(index);
-                                            },
-                                            btn2: async function (index, layero) {
-                                                const files = selectedVideos.map(value => {
-                                                    return {
-                                                        identity: value,
-                                                    };
-                                                });
-                                                let data = { "ids": files, url: "/api/file/delete" }
-                                                await deleteMutation(data, url);
-                                                layer.close(index);
-                                            }
-                                        });
+                                        if (selectedVideos.length > 0) {
+                                            layer.open({
+                                                type: 1,
+                                                title: '直接删除将不会把文件放到回收站!!!!',
+                                                btn: ['回收站', '直接删除'],
+                                                yes: async function (index, layero) {
+                                                    const files = selectedVideos.map(value => {
+                                                        return {
+                                                            identity: value,
+                                                        };
+                                                    });
+                                                    let data = { "ids": files, url: "/api/file/trash" }
+                                                    await deleteMutation(data);
+                                                    layer.close(index);
+                                                },
+                                                btn2: async function (index, layero) {
+                                                    const files = selectedVideos.map(value => {
+                                                        return {
+                                                            identity: value,
+                                                        };
+                                                    });
+                                                    let data = { "ids": files, url: "/api/file/delete" }
+                                                    await deleteMutation(data, url);
+                                                    layer.close(index);
+                                                }
+                                            });
+                                        } else {
+                                            layer.alert("请选择要删除的数据", { icon: 5 });
+                                        }
+
                                     }}
                                     text="删除所选"
                                     className="bg-teal border-0"
@@ -1966,8 +1971,12 @@
                             <ButtonGroup className="bg-teal">
                                 <IconButton
                                     onClick={async () => {
-                                        let data = { "ids": selectedTasks }
-                                        await deleteMutation(data);
+                                        if (selectedTasks.length > 0) {
+                                            let data = { "ids": selectedTasks }
+                                            await deleteMutation(data);
+                                        } else {
+                                            layer.alert("请选择要删除的数据", { icon: 5 });
+                                        }
                                     }}
                                     text="清理记录"
                                     className="bg-teal border-0"
