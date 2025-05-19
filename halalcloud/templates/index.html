@@ -1582,6 +1582,22 @@
                         >
                             <ButtonGroup className="bg-teal">
                                 <IconButton
+                                    onClick={async () => {
+                                        layer.confirm('确定删除？该操作无法撤销!!!', { icon: 3 }, async function (index) {
+                                            let data = { "id": "/" }
+                                            await deleteMutation(data);
+                                            layer.close(index);
+                                        }, function () {
+
+                                        });
+                                    }}
+                                    text="清空回收站"
+                                    className="bg-teal border-0"
+                                    icon="delete-empty-outline"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
+                                <IconButton
                                     onClick={() => {
                                         fetchData();
                                     }}
