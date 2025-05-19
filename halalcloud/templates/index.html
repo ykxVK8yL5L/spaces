@@ -1076,7 +1076,48 @@
             }, [location]);
 
 
+
+
+            const [isAllSelected, setIsAllSelected] = useState(false);
+            const [selectedVideos, setSelectedVideos] = useState([]);
+            const handleCheckboxChange = (event, optionId) => {
+                if (event.target.checked) {
+                    // 如果被勾选，则将该选项添加到 selectedVideos 中
+                    setSelectedVideos(prevState => [...prevState, optionId]);
+                } else {
+                    // 如果取消勾选，则从 selectedVideos 中移除该选项
+                    setSelectedVideos(prevState => prevState.filter(id => id !== optionId));
+                }
+            };
+
+            useEffect(() => {
+                setIsAllSelected(videos.length > 0 && selectedVideos.length === videos.length);
+            }, [selectedVideos]);
+            const handleSelectAllChange = (event) => {
+                if (event.target.checked) {
+                    // 全选：将所有选项的 id 添加到 selectedOptions 中
+                    setSelectedVideos(videos.map(option => option.identity));
+                } else {
+                    // 取消全选：清空选中的选项
+                    setSelectedVideos([]);
+                }
+            };
+
+
             const columns = [
+                {
+                    title: (<input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={handleSelectAllChange}
+                    />), dataIndex: "identity", render: (row) => (
+                        <input
+                            type="checkbox"
+                            checked={selectedVideos.includes(row.identity)}
+                            onChange={(e) => handleCheckboxChange(e, row.identity)}
+                        />
+                    )
+                },
                 { title: "文件名称", dataIndex: "name" },
                 { title: "大小", dataIndex: "size", render: (row) => (bytesToSize(Number(row.size))) },
                 { title: "日期", dataIndex: "create_ts", render: (row) => (formatDate(row.create_ts)) },
@@ -1124,12 +1165,12 @@
                                         title: '直接删除将不会把文件放到回收站!!!!',
                                         btn: ['回收站', '直接删除'],
                                         yes: async function (index, layero) {
-                                            let data = { "id": row.name, url: "/api/file/trash" }
+                                            let data = { "ids": [{ identity: row.identity }], url: "/api/file/trash" }
                                             await deleteMutation(data);
                                             layer.close(index);
                                         },
                                         btn2: async function (index, layero) {
-                                            let data = { "id": row.name, url: "/api/file/delete" }
+                                            let data = { "ids": [{ identity: row.identity }], url: "/api/file/delete" }
                                             await deleteMutation(data, url);
                                             layer.close(index);
                                         }
@@ -1170,8 +1211,8 @@
                 mutationKey: ["delete_file"],
                 mutationFn: async (fileinfo) => {
                     showLoading();
-                    var fiel_path = path + '/' + fileinfo.id;
-                    var data = { source: [{ path: fiel_path }] }
+                    //var fiel_path = path + '/' + fileinfo.id;
+                    var data = { source: fileinfo.ids }
                     return await axios.delete(fileinfo.url, {
                         data: data
                     })
@@ -1244,7 +1285,8 @@
                 if (deleteData) {
                     layer.msg("删除完成，请刷新查看结果");
                     setPageToken("")
-                    filesMutation();
+                    setVideos([])
+                    filesMutation()
                 }
             }, [deleteData]);
 
@@ -1263,6 +1305,8 @@
                 setReload((pre) => !pre);
             };
 
+
+
             return (
                 <div>
                     <div className="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
@@ -1272,6 +1316,40 @@
                             className="bg-teal rounded"
                         >
                             <ButtonGroup className="bg-teal">
+                                <IconButton
+                                    onClick={async () => {
+                                        layer.open({
+                                            type: 1,
+                                            title: '直接删除将不会把文件放到回收站!!!!',
+                                            btn: ['回收站', '直接删除'],
+                                            yes: async function (index, layero) {
+                                                const files = selectedVideos.map(value => {
+                                                    return {
+                                                        identity: value,
+                                                    };
+                                                });
+                                                let data = { "ids": files, url: "/api/file/trash" }
+                                                await deleteMutation(data);
+                                                layer.close(index);
+                                            },
+                                            btn2: async function (index, layero) {
+                                                const files = selectedVideos.map(value => {
+                                                    return {
+                                                        identity: value,
+                                                    };
+                                                });
+                                                let data = { "ids": files, url: "/api/file/delete" }
+                                                await deleteMutation(data, url);
+                                                layer.close(index);
+                                            }
+                                        });
+                                    }}
+                                    text="删除所选"
+                                    className="bg-teal border-0"
+                                    icon="delete-outline"
+                                    iconClassName="me-1 text-white"
+                                    iconSize="6"
+                                />
                                 <IconButton
                                     onClick={() => {
                                         fetchData();
@@ -1897,9 +1975,6 @@
                                     iconClassName="me-1 text-white"
                                     iconSize="6"
                                 />
-                            </ButtonGroup>
-
-                            <ButtonGroup className="bg-teal">
                                 <IconButton
                                     onClick={() => {
                                         fetchData();
