@@ -1171,7 +1171,7 @@
                                         },
                                         btn2: async function (index, layero) {
                                             let data = { "ids": [{ identity: row.identity }], url: "/api/file/delete" }
-                                            await deleteMutation(data, url);
+                                            await deleteMutation(data);
                                             layer.close(index);
                                         }
                                     });
@@ -1340,7 +1340,7 @@
                                                         };
                                                     });
                                                     let data = { "ids": files, url: "/api/file/delete" }
-                                                    await deleteMutation(data, url);
+                                                    await deleteMutation(data);
                                                     layer.close(index);
                                                 }
                                             });
