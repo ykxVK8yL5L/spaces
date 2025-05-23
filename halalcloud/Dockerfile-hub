@@ -1,5 +1,5 @@
 # 使用官方 Golang 镜像作为构建阶段的基础镜像
-FROM golang:1.24.1 AS builder
+FROM golang AS builder
 
 # 设置工作目录
 WORKDIR /app
