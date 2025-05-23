@@ -16,6 +16,6 @@ RUN go build -o halalcloud .
 FROM alpine
 
 WORKDIR /app
-COPY --from=builder /app/halalcloud /home/user/.local/bin/halalcloud
+COPY --from=builder /app/halalcloud /usr/bin/halalcloud
 CMD ["halalcloud"]
 EXPOSE 8080
