@@ -19,7 +19,7 @@ Code Server:/coder/
 
 Space variables (Public)说明:   
 
-Space secrets(Private)说明:
+Space secrets(Private)说明:   
 ADMIN_PASSWORD: coder server管理密码   
 RCLONE_CONF: rclone配置内容，可选，用来同步数据  
  
