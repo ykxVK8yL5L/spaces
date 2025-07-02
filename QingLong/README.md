@@ -7,10 +7,9 @@ sdk: docker
 pinned: false
 app_port: 5700
 ---
-演示视频：    
-https://youtu.be/fGxS3GOmI3Y    
+演示视频：   
 https://youtu.be/jjmPOXuebi0   
-
+https://youtu.be/fGxS3GOmI3Y    
 
 
 Space secrets(Private)说明:   
