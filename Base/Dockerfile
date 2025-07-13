@@ -64,12 +64,14 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
 
 RUN npm install -g pnpm pm2 n8n
 
+RUN mkdir /n8n-data
 RUN chmod -R 777 /var && \
     chmod -R 777 /usr/local && \
     chmod -R 777 /etc/nginx && \
     chmod -R 777 /run && \
     chmod -R 777 /usr && \
-    chmod -R 777 /root 
+    chmod -R 777 /root && \ 
+    chmod -R 777 /n8n-data
 
 # Install code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
