@@ -37,4 +37,6 @@ else
     echo "没有检测到Rclone配置信息"
 fi
 
+ln -s ~/.n8n /n8n-data
+
 n8n start
