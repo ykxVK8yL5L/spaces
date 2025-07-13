@@ -1,15 +1,6 @@
 name: Build and Push N8n Docker Image
 
 on:
-  # push:
-  #   branches: [ main ]
-  #   paths:
-  #     - 'QingLong/services.json'
-  #     - 'QingLong/notify.py'
-  #     - 'QingLong/front.conf'
-  #     - 'QingLong/docker-entrypoint.sh'
-  #     - 'QingLong/README.md'
-  #     - 'QingLong/Dockerfile'
   workflow_dispatch:
 
 jobs:
