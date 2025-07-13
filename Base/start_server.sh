@@ -35,7 +35,7 @@ else
 fi
 
 
-ln -s ~/.n8n /n8n-data
+ln -s ~/.n8n ~/n8n-data
 mkdir /etc/nginx/conf.d
 mkdir /run/nginx
 cp -fv /home/coder/apps.conf /etc/nginx/conf.d
