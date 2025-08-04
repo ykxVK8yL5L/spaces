@@ -1,0 +1,68 @@
+name: 使用抱脸SDK创建青龙面板
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      Token:
+        description: '抱脸的Token,需要写权限'
+        required: true
+        default: ''
+      UserID:
+        description: '抱脸用户名'
+        required: true
+        default: ''
+      Image:
+        description: '青龙docker镜像地址'
+        required: false
+        default: ''
+      Admin:
+        description: '青龙管理用户名'
+        required: false
+        default: ''
+      Password:
+        description: '青龙管理密码'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: macos-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: true # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 
+      
+      - name: 安装Rclone
+        run: |
+            curl https://rclone.org/install.sh | sudo bash
+
+      - name: 检查系统依赖
+        run: |
+            rclone -V
+            python -V
+            
+      - name: 配置Rclone
+        run: |
+          printf "$RCLONE_ENV_FILE" >> ~/.config/rclone/rclone.conf
+        shell: bash
+        env:
+          RCLONE_ENV_FILE : ${{secrets.RCLONE_CONF}}
+        
+      - name: 安装所需依赖
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install huggingface_hub
+
+      - name: 运行脚本
+        run: |
+          python qinglong.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --admin="${{ github.event.inputs.Admin}}" --password="${{ github.event.inputs.Password}}" --image="${{ github.event.inputs.Image}}"
+   
+      # - name: Delete workflow runs
+      #   uses: Mattraks/delete-workflow-runs@v1.2.3
+      #   with:
+      #     token: ${{ github.token }}
+      #     repository: ${{ github.repository }}
+      #     retain_days: 0
+      #     keep_minimum_runs: 0
