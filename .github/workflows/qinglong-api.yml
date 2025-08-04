@@ -33,6 +33,9 @@ jobs:
         with:
           persist-credentials: true # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
           fetch-depth: 0 
+          
+      - name: 隐藏输入信息
+        uses: levibostian/action-hide-sensitive-inputs@v1
       
       - name: 安装Rclone
         run: |
