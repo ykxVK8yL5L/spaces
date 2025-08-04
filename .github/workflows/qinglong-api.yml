@@ -11,16 +11,16 @@ on:
         description: '抱脸用户名'
         required: true
         default: ''
-      Image:
-        description: '青龙docker镜像地址'
-        required: false
-        default: ''
       Admin:
         description: '青龙管理用户名'
         required: false
         default: ''
       Password:
         description: '青龙管理密码'
+        required: false
+        default: ''
+      Image:
+        description: '青龙docker镜像地址'
         required: false
         default: ''
 
