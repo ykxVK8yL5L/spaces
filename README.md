@@ -16,7 +16,7 @@ https://infini-cloud.net/en/
 
 
 python文件为使用抱脸sdk创建space代码：   
-青龙面板使用方法[token和repoid为必填参数]:   
+青龙面板使用方法[token和userid为必填参数]:   
 ```
 python qinglong.py --token="" --userid="" --admin="" --password="" --image="" --rclone_conf_path=""
 ```
