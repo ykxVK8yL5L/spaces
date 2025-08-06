@@ -73,8 +73,7 @@ if __name__ == "__main__":
     rclone_conf = ""
     if len(args.rclone_conf_path) > 0:
         rclone_conf_path = args.rclone_conf_path
-        rclone_conf = read_file_if_not_empty(rclone_conf_path)
-
+    rclone_conf = read_file_if_not_empty(rclone_conf_path)
     # space_name = generate_random_string(2)
     space_name = "n8n"
     repoid = f"{userid}/{space_name}"
