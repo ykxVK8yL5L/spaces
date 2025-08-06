@@ -64,10 +64,20 @@ if __name__ == "__main__":
         print("userid 不能为空")
         sys.exit(1)
     image = "ghcr.io/ykxvk8yl5l/spaces/qinglong:latest"
+    if len(args.image) > 0:
+        image = args.image
+
     admin = "Hadmin123456"
+    if len(args.admin) > 0:
+        admin = args.admin
     password = "Hpassword654321"
+    if len(args.password) > 0:
+        password = args.password
     rclone_conf_path = "~/.config/rclone/rclone.conf"
     rclone_conf = ""
+    if len(args.rclone_conf_path) > 0:
+        rclone_conf_path = args.rclone_conf_path
+        rclone_conf = read_file_if_not_empty(rclone_conf_path)
     space_name = generate_random_string(2)
     repoid = f"{userid}/{space_name}"
 
@@ -87,19 +97,6 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
 
     # 转成 file-like object（以字节形式）
     readme_obj = BytesIO(readme_content.encode("utf-8"))
-
-    if len(args.image) > 0:
-        image = args.image
-
-    if len(args.admin) > 0:
-        admin = args.admin
-
-    if len(args.image) > 0:
-        password = args.password
-
-    if len(args.rclone_conf_path) > 0:
-        rclone_conf_path = args.rclone_conf_path
-        rclone_conf = read_file_if_not_empty(rclone_conf_path)
 
     api = HfApi(token=token)
     api.create_repo(

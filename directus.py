@@ -7,7 +7,9 @@ import argparse
 from huggingface_hub import HfApi
 
 
-parser = argparse.ArgumentParser(description="抱脸SDK创建N8n")
+parser = argparse.ArgumentParser(
+    description="抱脸SDK创建Directus【无头CMS】,目前仅支持postgres"
+)
 parser.add_argument(
     "--token",
     type=str,
@@ -17,8 +19,10 @@ parser.add_argument(
 )
 parser.add_argument("--userid", type=str, required=True, help="抱脸用户名", default="")
 parser.add_argument("--image", help="Docker镜像地址", default="")
-parser.add_argument("--key", help="N8N的N8N_ENCRYPTION_KEY", default="")
 parser.add_argument("--rclone_conf_path", help="Rclone配置", default="")
+parser.add_argument(
+    "--db_connect_string", help="数据库链接；目前仅支持postgres", default=""
+)
 
 
 args = parser.parse_args()
@@ -62,22 +66,20 @@ if __name__ == "__main__":
     else:
         print("userid 不能为空")
         sys.exit(1)
-    image = "ghcr.io/ykxvk8yl5l/spaces/n8n:latest"
+    image = "FROM directus/directus"
     if len(args.image) > 0:
         image = args.image
-
-    key = "952a63942ad0c68a"
-    if len(args.key) > 0:
-        key = args.key
     rclone_conf_path = "~/.config/rclone/rclone.conf"
     rclone_conf = ""
     if len(args.rclone_conf_path) > 0:
         rclone_conf_path = args.rclone_conf_path
         rclone_conf = read_file_if_not_empty(rclone_conf_path)
-
+    space_name = "directus"
     # space_name = generate_random_string(2)
-    space_name = "n8n"
     repoid = f"{userid}/{space_name}"
+    db_connect_string = ""
+    if len(args.db_connect_string) > 0:
+        db_connect_string = args.db_connect_string
 
     # readme.md的字符串内容
     readme_content = f"""
@@ -85,10 +87,10 @@ if __name__ == "__main__":
 title: {space_name}
 emoji: ⚡
 colorFrom: red
-colorTo: gray
+colorTo: indigo
 sdk: docker
-app_port: 5678
 pinned: false
+app_port: 8055
 ---
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
     """
@@ -102,14 +104,9 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
         repo_type="space",
         space_sdk="docker",
         space_secrets=[
-            {"key": "N8N_ENCRYPTION_KEY", "value": key},
-            {"key": "RCLONE_CONF", "value": rclone_conf},
-        ],
-        space_variables=[
-            {"key": "GENERIC_TIMEZONE", "value": "Asia/Shanghai"},
-            {"key": "TZ", "value": "Asia/Shanghai"},
-            {"key": "N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS", "value": "true"},
-            {"key": "WEBHOOK_URL", "value": f"https://{userid}-{space_name}.hf.space"},
+            {"key": "DB_CLIENT", "value": "pg"},
+            {"key": "DB_CONNECTION_STRING", "value": db_connect_string},
+            {"key": "NODE_TLS_REJECT_UNAUTHORIZED", "value": 0},
         ],
     )
 

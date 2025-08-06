@@ -1,4 +1,4 @@
-name: 使用抱脸SDK创建N8N
+name: 使用抱脸SDK创建Directus【无头CMS】
 on:
   repository_dispatch:
   workflow_dispatch:
@@ -11,14 +11,11 @@ on:
         description: '抱脸用户名'
         required: true
         default: ''
-      Key:
-        description: 'N8N的加密Key:这个需要妥善保管'
+      DbConnectString:
+        description: '数据库链接字符串:目前仅支持posstgres'
         required: true
         default: ''
-      Image:
-        description: 'Docker镜像地址'
-        required: false
-        default: ''
+
 
 jobs:
   build:
@@ -56,7 +53,7 @@ jobs:
 
       - name: 运行脚本
         run: |
-          python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --key="${{ github.event.inputs.Key}}" --image="${{ github.event.inputs.Image}}"
+          python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --db_connect_string="${{ github.event.inputs.DbConnectString}}"
    
       # - name: Delete workflow runs
       #   uses: Mattraks/delete-workflow-runs@v1.2.3
