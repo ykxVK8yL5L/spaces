@@ -1,4 +1,4 @@
-name: 使用抱脸SDK创建青龙面板
+name: 使用抱脸SDK创建N8N
 on:
   repository_dispatch:
   workflow_dispatch:
