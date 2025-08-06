@@ -25,8 +25,21 @@ args = parser.parse_args()
 
 
 def generate_random_string(length=10):
-    chars = string.ascii_letters + string.digits  # 包含大小写字母和数字
-    return "".join(random.choices(chars, k=length))
+    if length < 1:
+        return ""
+    
+    chars = string.ascii_letters + string.digits  # 包含字母和数字
+    # 1. 先强制加入一个随机字母
+    mandatory_letter = random.choice(string.ascii_letters)
+
+    # 2. 生成剩余的字符
+    remaining_chars = random.choices(chars, k=length - 1)
+
+    # 3. 将强制字母加入随机位置
+    full_chars = remaining_chars + [mandatory_letter]
+    random.shuffle(full_chars)
+
+    return "".join(full_chars)
 
 
 def read_file_if_not_empty(file_path):
