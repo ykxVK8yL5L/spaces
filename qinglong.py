@@ -34,7 +34,6 @@ def generate_random_string(length=10):
         return ""
     
     chars = string.ascii_letters + string.digits  # 包含字母和数字
-
     # 1. 先强制加入一个随机字母
     mandatory_letter = random.choice(string.ascii_letters)
 
