@@ -60,7 +60,7 @@ jobs:
 
       - name: 运行脚本
         run: |
-          rclone_conf_path=$(rclone config file)
+          rclone_conf_path=$(rclone config file | awk 'NR==2')
           python qinglong.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --rclone_conf_path="$rclone_conf_path" --admin="${{ github.event.inputs.Admin}}" --password="${{ github.event.inputs.Password}}" --image="${{ github.event.inputs.Image}}"
    
       # - name: Delete workflow runs

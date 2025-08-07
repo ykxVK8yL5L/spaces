@@ -56,7 +56,7 @@ jobs:
 
       - name: 运行脚本
         run: |
-          rclone_conf_path=$(rclone config file)
+          rclone_conf_path=$(rclone config file | awk 'NR==2')
           python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --rclone_conf_path="$rclone_conf_path" --key="${{ github.event.inputs.Key}}" --image="${{ github.event.inputs.Image}}"
    
       # - name: Delete workflow runs
