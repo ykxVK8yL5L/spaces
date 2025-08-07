@@ -29,10 +29,11 @@ args = parser.parse_args()
 #     chars = string.ascii_letters + string.digits  # 包含大小写字母和数字
 #     return "".join(random.choices(chars, k=length))
 
+
 def generate_random_string(length=10):
     if length < 1:
         return ""
-    
+
     chars = string.ascii_letters + string.digits  # 包含字母和数字
     # 1. 先强制加入一个随机字母
     mandatory_letter = random.choice(string.ascii_letters)
@@ -95,6 +96,11 @@ if __name__ == "__main__":
     if len(args.rclone_conf_path) > 0:
         rclone_conf_path = args.rclone_conf_path
     rclone_conf = read_file_if_not_empty(rclone_conf_path)
+
+    print(rclone_conf_path)
+    print(rclone_conf)
+    quit()
+
     space_name = generate_random_string(2)
     repoid = f"{userid}/{space_name}"
 
