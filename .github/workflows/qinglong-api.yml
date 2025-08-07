@@ -52,6 +52,13 @@ jobs:
         shell: bash
         env:
           RCLONE_ENV_FILE : ${{secrets.RCLONE_CONF}}
+
+      - name: 调试Rclone
+        run: |
+          cat ~/.config/rclone/rclone.conf
+          rclone config file
+          rclone config show
+          
         
       - name: 安装所需依赖
         run: |
