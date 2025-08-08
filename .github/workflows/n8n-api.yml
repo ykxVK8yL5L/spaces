@@ -15,6 +15,10 @@ on:
         description: 'N8N的加密Key:这个需要妥善保管'
         required: true
         default: ''
+      Password:
+        description: 'Code Server的管理密码'
+        required: true
+        default: ''
       Image:
         description: 'Docker镜像地址'
         required: false
@@ -57,7 +61,7 @@ jobs:
       - name: 运行脚本
         run: |
           rclone_conf_path=$(rclone config file | awk 'NR==2')
-          python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --rclone_conf_path="$rclone_conf_path" --key="${{ github.event.inputs.Key}}" --image="${{ github.event.inputs.Image}}"
+          python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --rclone_conf_path="$rclone_conf_path" --key="${{ github.event.inputs.Key}}" --password="${{ github.event.inputs.Password}}" --image="${{ github.event.inputs.Image}}"
    
       # - name: Delete workflow runs
       #   uses: Mattraks/delete-workflow-runs@v1.2.3
