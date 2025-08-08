@@ -18,6 +18,7 @@ parser.add_argument(
 parser.add_argument("--userid", type=str, required=True, help="抱脸用户名", default="")
 parser.add_argument("--image", help="Docker镜像地址", default="")
 parser.add_argument("--key", help="N8N的N8N_ENCRYPTION_KEY", default="")
+parser.add_argument("--password", help="Code Server的管理密码", default="")
 parser.add_argument("--rclone_conf_path", help="Rclone配置", default="")
 
 
@@ -86,6 +87,9 @@ if __name__ == "__main__":
     rclone_conf = ""
     if len(args.rclone_conf_path) > 0:
         rclone_conf_path = args.rclone_conf_path
+    password = ""
+    if len(args.password)>0:
+        password = args.password
     rclone_conf = read_file_if_not_empty(rclone_conf_path)
     # space_name = generate_random_string(2)
     space_name = "n8n"
@@ -116,6 +120,7 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
         space_secrets=[
             {"key": "N8N_ENCRYPTION_KEY", "value": key},
             {"key": "RCLONE_CONF", "value": rclone_conf},
+            {"key": "ADMIN_PASSWORD","value":password},
         ],
         space_variables=[
             {"key": "GENERIC_TIMEZONE", "value": "Asia/Shanghai"},
