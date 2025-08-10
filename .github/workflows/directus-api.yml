@@ -7,10 +7,6 @@ on:
         description: '抱脸的Token,需要写权限'
         required: true
         default: ''
-      UserID:
-        description: '抱脸用户名'
-        required: true
-        default: ''
       DbConnectString:
         description: '数据库链接字符串:目前仅支持posstgres'
         required: true
@@ -54,7 +50,7 @@ jobs:
       - name: 运行脚本
         run: |
           rclone_conf_path=$(rclone config file | awk 'NR==2')
-          python n8n.py --token="${{ github.event.inputs.Token}}" --userid="${{ github.event.inputs.UserID}}" --rclone_conf_path="$rclone_conf_path" --db_connect_string="${{ github.event.inputs.DbConnectString}}"
+          python n8n.py --token="${{ github.event.inputs.Token}}" --rclone_conf_path="$rclone_conf_path" --db_connect_string="${{ github.event.inputs.DbConnectString}}"
    
       # - name: Delete workflow runs
       #   uses: Mattraks/delete-workflow-runs@v1.2.3

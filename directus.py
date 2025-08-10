@@ -17,7 +17,6 @@ parser.add_argument(
     help="抱脸的Token,需要写权限",
     default="",
 )
-parser.add_argument("--userid", type=str, required=True, help="抱脸用户名", default="")
 parser.add_argument("--image", help="Docker镜像地址", default="")
 parser.add_argument("--rclone_conf_path", help="Rclone配置", default="")
 parser.add_argument(
@@ -31,7 +30,7 @@ args = parser.parse_args()
 def generate_random_string(length=10):
     if length < 1:
         return ""
-    
+
     chars = string.ascii_letters + string.digits  # 包含字母和数字
     # 1. 先强制加入一个随机字母
     mandatory_letter = random.choice(string.ascii_letters)
@@ -73,12 +72,12 @@ if __name__ == "__main__":
         print("Token 不能为空")
         sys.exit(1)
         # raise ValueError("字符串不能为空！")
-    userid = ""
-    if len(args.userid) > 0:
-        userid = args.userid
-    else:
-        print("userid 不能为空")
+    api = HfApi(token=token)
+    user_info = api.whoami()
+    if not user_info.get("name"):
+        print("未获取到用户名信息，程序退出。")
         sys.exit(1)
+    userid = user_info.get("name")
     image = "FROM directus/directus"
     if len(args.image) > 0:
         image = args.image

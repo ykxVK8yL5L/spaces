@@ -15,7 +15,6 @@ parser.add_argument(
     help="抱脸的Token,需要写权限",
     default="",
 )
-parser.add_argument("--userid", type=str, required=True, help="抱脸用户名", default="")
 parser.add_argument("--image", help="Docker镜像地址", default="")
 parser.add_argument("--key", help="N8N的N8N_ENCRYPTION_KEY", default="")
 parser.add_argument("--password", help="Code Server的管理密码", default="")
@@ -28,7 +27,7 @@ args = parser.parse_args()
 def generate_random_string(length=10):
     if length < 1:
         return ""
-    
+
     chars = string.ascii_letters + string.digits  # 包含字母和数字
     # 1. 先强制加入一个随机字母
     mandatory_letter = random.choice(string.ascii_letters)
@@ -70,12 +69,12 @@ if __name__ == "__main__":
         print("Token 不能为空")
         sys.exit(1)
         # raise ValueError("字符串不能为空！")
-    userid = ""
-    if len(args.userid) > 0:
-        userid = args.userid
-    else:
-        print("userid 不能为空")
+    api = HfApi(token=token)
+    user_info = api.whoami()
+    if not user_info.get("name"):
+        print("未获取到用户名信息，程序退出。")
         sys.exit(1)
+    userid = user_info.get("name")
     image = "ghcr.io/ykxvk8yl5l/spaces/n8n:latest"
     if len(args.image) > 0:
         image = args.image
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     if len(args.rclone_conf_path) > 0:
         rclone_conf_path = args.rclone_conf_path
     password = ""
-    if len(args.password)>0:
+    if len(args.password) > 0:
         password = args.password
     rclone_conf = read_file_if_not_empty(rclone_conf_path)
     # space_name = generate_random_string(2)
@@ -108,11 +107,9 @@ pinned: false
 ---
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
     """
-
     # 转成 file-like object（以字节形式）
     readme_obj = BytesIO(readme_content.encode("utf-8"))
 
-    api = HfApi(token=token)
     api.create_repo(
         repo_id=repoid,
         repo_type="space",
@@ -120,7 +117,7 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
         space_secrets=[
             {"key": "N8N_ENCRYPTION_KEY", "value": key},
             {"key": "RCLONE_CONF", "value": rclone_conf},
-            {"key": "ADMIN_PASSWORD","value":password},
+            {"key": "ADMIN_PASSWORD", "value": password},
         ],
         space_variables=[
             {"key": "GENERIC_TIMEZONE", "value": "Asia/Shanghai"},
