@@ -20,3 +20,6 @@ python文件为使用抱脸sdk创建space代码：
 ```
 python qinglong.py --token="" --userid="" --admin="" --password="" --image="" --rclone_conf_path=""
 ```
+
+# 打包青龙镜像时最好修改下镜像名称为随机增加干扰     
+修改.github/workflows/qinglong.yml最后的ghcr.io/${{ steps.lower-repo.outputs.repository }}/qinglong:latest即可，会代码的最好替换所有qinglong字样
