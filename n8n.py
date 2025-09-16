@@ -90,8 +90,8 @@ if __name__ == "__main__":
     if len(args.password) > 0:
         password = args.password
     rclone_conf = read_file_if_not_empty(rclone_conf_path)
-    # space_name = generate_random_string(2)
-    space_name = "n8n"
+    space_name = generate_random_string(2)
+    #space_name = "n8n"
     repoid = f"{userid}/{space_name}"
 
     # readme.md的字符串内容
