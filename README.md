@@ -1,5 +1,6 @@
 # 在huggingface上部署Alist会秒封号 请勿使用！！！
 
+## 演示视频：https://youtu.be/RWjwOYcc8TQ
 
 # spaces
 Huggingface的一些space代码   
