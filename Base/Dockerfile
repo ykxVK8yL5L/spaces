@@ -1,7 +1,7 @@
 FROM node:24-slim as nodebuilder
 FROM rclone/rclone:latest AS rclone
 
-FROM python:3.13-slim-bullseye
+FROM python:3.13-slim-trixie
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -39,7 +39,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     default-jre \
     g++ \
     gcc \
-    libzbar0 \
+    libzbar0t64 \
     fish \
     ffmpeg \
     nmap \
