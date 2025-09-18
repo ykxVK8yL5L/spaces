@@ -1,7 +1,7 @@
-FROM node:22-slim as nodebuilder
+FROM node:24-slim as nodebuilder
 FROM rclone/rclone:latest AS rclone
 
-FROM python:3.13-slim-bullseye
+FROM python:3.13-slim-trixie
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
