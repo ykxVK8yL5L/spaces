@@ -74,19 +74,8 @@ RUN chmod -R 777 /var && \
     chmod -R 777 /n8n-data
 
 # Install code-server
-#RUN curl -fsSL https://code-server.dev/install.sh | sh
-RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
-
-
-
-# Create a user to run code-server
-RUN useradd -m -s /bin/zsh coder && \
-    echo 'coder ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# Create code-server configuration directory
-RUN mkdir -p /home/coder/.local/share/code-server/User
-RUN chmod -R 777 /home/coder
-
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+#RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
 
 
 # Add settings.json to enable dark mode
@@ -94,38 +83,25 @@ RUN echo '{ \
    "workbench.colorTheme": "Default Dark Modern", \
     "telemetry.enableTelemetry": true, \
     "telemetry.enableCrashReporter": true \
-}' > /home/coder/.local/share/code-server/User/settings.json
+}' > /root/.local/share/code-server/User/settings.json
 
-# Change ownership of the configuration directory
-RUN chown -R coder:coder /home/coder/.local/share/code-server
 
-# Install Python extension for code-server
-# RUN sudo -u coder code-server --install-extension ms-python.python
+USER root
 
-# Switch to the coder user for running code-server
-USER coder
+ENV HOME=/root \
+    PATH=/root/.local/bin:$PATH
 
-ENV HOME=/home/coder \
-    PATH=/home/coder/.local/bin:$PATH
-
-COPY --chown=coder start_server.sh $HOME
-COPY --chown=coder apps.conf $HOME
-COPY --chown=coder nginx.conf $HOME
+COPY  start_server.sh $HOME
+COPY  apps.conf $HOME
+COPY  nginx.conf $HOME
 
 RUN chmod +x $HOME/start_server.sh
 
-WORKDIR /home/coder
+WORKDIR /root
 
 # 创建rclone配置文件
 RUN rclone config -h
 
-# Start code-server with authentication
-# CMD ["sh", "-c", "code-server --bind-addr 0.0.0.0:7860"]
-
 CMD ["sh", "-c", "/home/coder/start_server.sh"]
-# ENTRYPOINT ["/home/coder/start_server.sh"]
-
-# Expose the default code-server port
 EXPOSE 5700
 
-# End of Dockerfile
