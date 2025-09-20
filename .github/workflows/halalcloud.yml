@@ -39,5 +39,5 @@ jobs:
           docker buildx build . \
             --platform linux/amd64 \
             --output "type=image,push=true" \
-            --file Dockerfile-hub \
+            --file Dockerfile \
             --tag ykxvk8yl5l/halalcloud:latest
