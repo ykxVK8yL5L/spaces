@@ -74,14 +74,14 @@ RUN chmod -R 777 /var && \
     chmod -R 777 /n8n-data
 
 # Install code-server
-RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.104.1
 
 # Create code-server configuration directory
 RUN mkdir -p /root/.local/share/code-server/User
 RUN chmod -R 777 /root
 
-RUN mkdir -p /root/project
-RUN chmod -R 777 /root/project
+RUN mkdir -p /home/coder
+RUN chmod -R 777 /home/coder
 
 # Add settings.json to enable dark mode
 RUN echo '{ \
@@ -100,7 +100,7 @@ COPY  nginx.conf $HOME
 
 RUN chmod +x $HOME/start_server.sh
 
-WORKDIR /root
+WORKDIR /home/coder
 
 # 创建rclone配置文件
 RUN rclone config -h
