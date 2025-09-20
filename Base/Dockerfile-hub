@@ -76,6 +76,18 @@ RUN chmod -R 777 /var && \
 # Install code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
 
+# Create code-server configuration directory
+RUN mkdir -p /root/.local/share/code-server/User
+RUN chmod -R 777 /root
+
+
+
+# Add settings.json to enable dark mode
+RUN echo '{ \
+   "workbench.colorTheme": "Default Dark Modern", \
+    "telemetry.enableTelemetry": true, \
+    "telemetry.enableCrashReporter": true \
+}' > /root/.local/share/code-server/User/settings.json
 
 USER root
 ENV HOME=/root \
