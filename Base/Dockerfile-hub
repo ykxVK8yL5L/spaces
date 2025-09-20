@@ -82,7 +82,7 @@ RUN echo '{ \
    "workbench.colorTheme": "Default Dark Modern", \
     "telemetry.enableTelemetry": true, \
     "telemetry.enableCrashReporter": true \
-}' > /home/coder/.local/share/code-server/User/settings.json
+}' > ~/.local/share/code-server/User/settings.json
 
 
 COPY  start_server.sh $HOME
