@@ -80,7 +80,8 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc
 RUN mkdir -p /root/.local/share/code-server/User
 RUN chmod -R 777 /root
 
-
+RUN mkdir -p /root/project
+RUN chmod -R 777 /root/project
 
 # Add settings.json to enable dark mode
 RUN echo '{ \
