@@ -94,6 +94,6 @@ WORKDIR /root
 # 创建rclone配置文件
 RUN rclone config -h
 
-CMD ["sh", "-c", "/home/coder/start_server.sh"]
+CMD ["sh", "-c", "/root/start_server.sh"]
 EXPOSE 5700
 
