@@ -74,7 +74,10 @@ RUN chmod -R 777 /var && \
     chmod -R 777 /n8n-data
 
 # Install code-server
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+#RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
+
+
 
 # Create a user to run code-server
 RUN useradd -m -s /bin/zsh coder && \
