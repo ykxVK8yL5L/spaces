@@ -87,12 +87,12 @@ COPY  nginx.conf $HOME
 
 RUN chmod +x $HOME/start_server.sh
 
-WORKDIR ~
+WORKDIR /root
 
 # 创建rclone配置文件
 RUN rclone config -h
 
-CMD ["sh", "-c", "~/start_server.sh"]
+CMD ["sh", "-c", "/root/start_server.sh"]
 
 EXPOSE 5700
 
