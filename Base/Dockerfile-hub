@@ -78,8 +78,8 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc
 
 
 USER root
-ENV HOME=~ \
-    PATH=~/.local/bin:$PATH
+ENV HOME=/root \
+    PATH=/root/.local/bin:$PATH
 
 COPY  start_server.sh $HOME
 COPY  apps.conf $HOME
