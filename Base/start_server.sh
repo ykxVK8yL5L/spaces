@@ -47,11 +47,12 @@ echo -e "nginx启动成功...\n"
 
 echo -e "======================启动pm2服务========================\n"
 pm2 start n8n
+pm2 start "code-server --bind-addr 0.0.0.0:7860 --port 7860" --name "code-server" --env PASSWORD=$ADMIN_PASSWORD
 pm2 startup
 pm2 save
 
-export PASSWORD=$ADMIN_PASSWORD
-code-server --bind-addr 0.0.0.0:7860 --port 7860
+# export PASSWORD=$ADMIN_PASSWORD
+# code-server --bind-addr 0.0.0.0:7860 --port 7860
 
 tail -f /dev/null
 
