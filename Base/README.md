@@ -12,7 +12,8 @@ app_port: 5700
 ## 以Code Serer为核心的用nginx做为反代来部署多个服务
 目前已经添加服务   
 n8n地址:/   
-Code Server:/coder/   
+Code Server:/coder/     
+code server可通过n8n的shell节点执行：pm2 start/stop code-server来启动或停止
 
 
 ## 如使用Rclone方法需要设置:
