@@ -116,8 +116,13 @@ else
 fi
 
 #pm2 start code-server --name "code-server" -- --bind-addr 0.0.0.0:7860 --port 7860
+# export PASSWORD=$ADMIN_PASSWORD
+# code-server --bind-addr 0.0.0.0:7860 --port 7860
+
 export PASSWORD=$ADMIN_PASSWORD
-code-server --bind-addr 0.0.0.0:7860 --port 7860
+pm2 start "code-server --bind-addr 0.0.0.0:7860 --port 7860" --name "code-server"
+pm2 startup
+pm2 save
 
 tail -f /dev/null
 
