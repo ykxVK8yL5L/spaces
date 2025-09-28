@@ -6,7 +6,6 @@ import sys
 import argparse
 from huggingface_hub import HfApi
 
-
 parser = argparse.ArgumentParser(description="抱脸SDK创建N8n")
 parser.add_argument(
     "--token",
@@ -20,9 +19,7 @@ parser.add_argument("--key", help="N8N的N8N_ENCRYPTION_KEY", default="")
 parser.add_argument("--password", help="Code Server的管理密码", default="")
 parser.add_argument("--rclone_conf_path", help="Rclone配置", default="")
 
-
 args = parser.parse_args()
-
 
 def generate_random_string(length=10):
     if length < 1:
