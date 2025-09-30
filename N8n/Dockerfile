@@ -55,6 +55,7 @@ RUN mkdir -p /npm-global && \
 # 将该目录加入到 PATH 环境变量中
 ENV PATH=/npm-global/bin:$PATH
 
+RUN npm config set prefix '/npm-global'
 # Install n8n globally
 RUN npm install -g n8n@1.86.1
 
