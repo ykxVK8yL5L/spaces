@@ -119,8 +119,6 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
         space_variables=[
             {"key": "GENERIC_TIMEZONE", "value": "Asia/Shanghai"},
             {"key": "TZ", "value": "Asia/Shanghai"},
-            {"key": "NODE_FUNCTION_ALLOW_BUILTIN", "value": "*"},
-            {"key": "NODE_FUNCTION_ALLOW_EXTERNAL", "value": "*"},
             {"key": "N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS", "value": "true"},
             {"key": "WEBHOOK_URL", "value": f"https://{userid}-{space_name}.hf.space"},
         ],
