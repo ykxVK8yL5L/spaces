@@ -62,6 +62,18 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     chromium \
     libatomic1 
 
+
+
+# 设置自定义的 npm global 安装路径
+ENV NPM_CONFIG_PREFIX=/npm-global
+
+# 创建一个共享的目录来安装全局包
+RUN mkdir -p /npm-global && \
+    chown -R 777 /npm-global
+
+# 将该目录加入到 PATH 环境变量中
+ENV PATH=/npm-global/bin:$PATH
+
 RUN npm install -g pnpm pm2 n8n
 
 RUN mkdir /n8n-data
