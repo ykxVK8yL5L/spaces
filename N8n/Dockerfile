@@ -2,7 +2,10 @@ FROM node:18-alpine
 
 # Set user to root for installation
 USER root
-
+ENV NODE_FUNCTION_ALLOW_BUILTIN=*
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
+ENV N8N_RUNNERS_STDLIB_ALLOW=*
+ENV N8N_RUNNERS_EXTERNAL_ALLOW=*
 # Arguments that can be passed at build time
 ARG N8N_PATH=/usr/local/lib/node_modules/n8n
 ARG BASE_PATH=/root/.n8n
