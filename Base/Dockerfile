@@ -68,8 +68,8 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
 ENV NPM_CONFIG_PREFIX=/npm-global
 
 # 创建一个共享的目录来安装全局包
-RUN mkdir -p /npm-global && \
-    chmod -R 777 /npm-global
+RUN mkdir -p /npm-global 
+    
 
 # 将该目录加入到 PATH 环境变量中
 ENV PATH=/npm-global/bin:$PATH
@@ -85,7 +85,8 @@ RUN chmod -R 777 /var && \
     chmod -R 777 /run && \
     chmod -R 777 /usr && \
     chmod -R 777 /root && \ 
-    chmod -R 777 /n8n-data
+    chmod -R 777 /n8n-data && \
+    chmod -R 777 /npm-global
 
 # Install code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
