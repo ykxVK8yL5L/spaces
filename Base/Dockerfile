@@ -74,6 +74,8 @@ RUN mkdir -p /npm-global && \
 # 将该目录加入到 PATH 环境变量中
 ENV PATH=/npm-global/bin:$PATH
 
+RUN npm config set prefix '/npm-global'
+
 RUN npm install -g pnpm pm2 n8n
 
 RUN mkdir /n8n-data
