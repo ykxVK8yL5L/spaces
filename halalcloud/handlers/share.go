@@ -217,7 +217,7 @@ func SaveShare(c *gin.Context) {
 	client := pubFileShare.NewPubFileShareClient(fserv.GetGrpcConnection())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
-	result, err := client.Get(ctx, &saveShareRequestBody)
+	result, err := client.Save(ctx, &saveShareRequestBody)
 
 	if err != nil {
 		fmt.Println(err)
