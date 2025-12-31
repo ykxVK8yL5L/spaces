@@ -5,6 +5,7 @@ FROM python:3.13-slim-trixie
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
+ENV REMOTE_FOLDER="huggingface:/n8n"
 ENV NODE_FUNCTION_ALLOW_BUILTIN=*
 ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
 ENV N8N_RUNNERS_STDLIB_ALLOW=*
