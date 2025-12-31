@@ -7,6 +7,7 @@ FROM python:3.13-slim-trixie
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
+ENV REMOTE_FOLDER="huggingface:/n8n-v2"
 ENV NODE_FUNCTION_ALLOW_BUILTIN=*
 ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
 ENV N8N_BLOCK_ENV_ACCESS_IN_NODE=false 
@@ -30,6 +31,7 @@ ARG GENERIC_TIMEZONE=$GENERIC_TIMEZONE
 ARG TZ=$TZ
 ARG N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY
 ARG RCLONE_CONF=$RCLONE_CONF
+
 
 
 COPY --from=n8nbuilder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
