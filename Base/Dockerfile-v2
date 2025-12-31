@@ -32,13 +32,11 @@ ARG N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY
 ARG RCLONE_CONF=$RCLONE_CONF
 
 
-COPY --from=n8nbuilder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules
+COPY --from=n8nbuilder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/n8n
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
 COPY --from=rclone /usr/local/bin/rclone /usr/bin/rclone
 
-
-RUN ls /usr/local/lib/node_modules
 
 
 # Install necessary packages
@@ -83,7 +81,7 @@ ENV NPM_CONFIG_PREFIX=/npm-global
 # 创建一个共享的目录来安装全局包
 RUN mkdir -p /npm-global 
     
-RUN cd /usr/local/lib/node_modules/n8n && npm rebuild sqlite3 
+RUN cd /usr/local/lib/node_modules/n8n && npm rebuild sqlite3  && ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n
 
 # 将该目录加入到 PATH 环境变量中
 ENV PATH=/npm-global/bin:$PATH
