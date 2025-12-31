@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./Base
-          file: Dockerfile-v2
+          file: ./Base/Dockerfile-v2
           push: true
           tags: |
             ghcr.io/${{ steps.lower-repo.outputs.repository }}/n8n-v2:latest
