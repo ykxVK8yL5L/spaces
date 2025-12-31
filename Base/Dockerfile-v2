@@ -38,7 +38,7 @@ COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_module
 COPY --from=rclone /usr/local/bin/rclone /usr/bin/rclone
 
 
-RUN ls /usr/local/lib/node_modules/n8n
+RUN ls /usr/local/lib/node_modules
 
 
 # Install necessary packages
