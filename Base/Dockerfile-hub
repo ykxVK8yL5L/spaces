@@ -5,6 +5,11 @@ FROM python:3.13-slim-trixie
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
+ENV REMOTE_FOLDER="huggingface:/n8n-v2"
+ENV NODE_FUNCTION_ALLOW_BUILTIN=*
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
+ENV N8N_RUNNERS_STDLIB_ALLOW=*
+ENV N8N_RUNNERS_EXTERNAL_ALLOW=*
 ARG N8N_PATH=/usr/local/lib/node_modules/n8n
 ARG BASE_PATH=/root/.n8n
 ARG N8N_PUSH_BACKEND=sse
