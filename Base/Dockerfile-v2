@@ -90,8 +90,6 @@ RUN npm config set prefix '/npm-global'
 
 RUN npm install -g pnpm pm2
 
-RUN cd /usr/local/lib/node_modules/n8n && npm rebuild sqlite3 
-
 RUN mkdir /n8n-data
 RUN chmod -R 777 /var && \
     chmod -R 777 /usr/local && \
