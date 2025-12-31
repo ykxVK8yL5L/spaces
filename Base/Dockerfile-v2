@@ -33,12 +33,16 @@ ARG RCLONE_CONF=$RCLONE_CONF
 
 
 COPY --from=n8nbuilder /usr/local/lib/node_modules/n8n /usr/local/lib/node_modules/
+COPY --from=n8nbuilder /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
 COPY --from=rclone /usr/local/bin/rclone /usr/bin/rclone
 
-RUN cd /usr/local/lib/node_modules/n8n && \
-		ln -s /usr/local/lib/node_modules/n8n/bin/n8n /usr/local/bin/n8n
+
+RUN ls /usr/local/lib/node_modules/n8n/bin
+RUN ls /usr/local/bin
+
+RUN cd /usr/local/lib/node_modules/n8n && npm rebuild sqlite3 
 
 # Install necessary packages
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
