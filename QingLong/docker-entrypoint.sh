@@ -96,9 +96,8 @@ if [ -n "$RCLONE_CONF" ]; then
       echo "初次安装"
     else
       #echo "文件夹不为空"
-      source /ql/shell/update.sh
       mkdir /ql/.tmp/data
-      rclone sync $REMOTE_FOLDER /ql/.tmp/data && real_time=true reload_qinglong data
+      rclone sync $REMOTE_FOLDER /ql/.tmp/data && real_time=true ql reload data
     fi
   elif [[ "$OUTPUT" == *"directory not found"* ]]; then
     echo "错误：文件夹不存在"
