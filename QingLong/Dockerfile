@@ -4,7 +4,7 @@ FROM python:3.11-slim-bookworm AS builder
 ARG QL_MAINTAINER="whyour"
 LABEL maintainer="${QL_MAINTAINER}"
 ARG QL_URL=https://github.com/${QL_MAINTAINER}/qinglong.git
-ARG QL_BRANCH=develop
+ARG QL_BRANCH=debian
 ENV QL_DIR=/ql_tmp
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
@@ -26,7 +26,7 @@ FROM python:3.11-slim-bookworm
 ARG QL_MAINTAINER="whyour"
 LABEL maintainer="${QL_MAINTAINER}"
 ARG QL_URL=https://github.com/${QL_MAINTAINER}/qinglong.git
-ARG QL_BRANCH=develop
+ARG QL_BRANCH=debian
 ARG PYTHON_SHORT_VERSION=3.11
 
 ENV REMOTE_FOLDER="huggingface:/qinglong"
