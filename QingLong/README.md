@@ -5,7 +5,7 @@ colorFrom: yellow
 colorTo: purple
 sdk: docker
 pinned: false
-app_port: 5700
+app_port: 8080
 ---
 演示视频：   
 https://youtu.be/jjmPOXuebi0   
