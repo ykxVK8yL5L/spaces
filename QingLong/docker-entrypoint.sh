@@ -128,7 +128,7 @@ fi
 
 if [ -n "$NOTIFY_CONFIG" ]; then
     python /notify.py
-    dir_root=/ql && source /ql/shell/api.sh && notify_api '青龙服务启动通知' '青龙面板成功启动'
+    dir_root=/ql && sleep 60 && source /ql/shell/api.sh && notify_api '青龙服务启动通知' '青龙面板成功启动'
 else
     echo "没有检测到通知配置信息，不进行通知"
 fi
