@@ -72,6 +72,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
     unzip \
     git \
     make \
+    zstd \ 
     chromium \
     libatomic1 
 
