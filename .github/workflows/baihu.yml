@@ -1,9 +1,6 @@
 name: Build and Push Baihu Docker Image
 
 on:
-  push:
-    branches: [ main ]
-    paths:
   workflow_dispatch:
 
 jobs:
