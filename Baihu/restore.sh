@@ -13,12 +13,28 @@ DEFAULT_PASSWORD=$(tail -n 100 ~/.pm2/logs/baihu-out.log \
     | tail -n 1)
 
 echo  "默认用户名: admin"
-echo  "默认密码: $DEFAULT_PASSWORD"
+#echo  "默认密码: $DEFAULT_PASSWORD"
 
+echo "============重置密码==============="
+# 获取登陆响应Token
+BHToken=$(
+curl -c cookies.txt -s -D - -o /dev/null \
+  'http://localhost:8052/api/v1/auth/login' \
+  -H 'content-type: application/json' \
+  --data-raw "{\"username\":\"admin\",\"password\":\"$DEFAULT_PASSWORD\"}" \
+| awk -F'[=;]' '/Set-Cookie: BHToken=/{print $2}'
+)
+
+sleep 1
+
+RESET_RESPONSE=$(
+  curl -b cookies.txt 'http://localhost:8052/api/v1/settings/password' \
+  -H 'content-type: application/json' \
+  --data-raw "{\"old_password\":\"$DEFAULT_PASSWORD\",\"new_password\":\"$ADMIN_PASSWORD\"}"
+)
 
 echo  "======================写入rclone配置========================\n"
 echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
-
 
 if [ -n "$RCLONE_CONF" ]; then
   echo "##########同步备份############"
@@ -35,14 +51,6 @@ if [ -n "$RCLONE_CONF" ]; then
       #为空不处理
       echo "初次安装"
     else
-      # 获取响应Token
-      BHToken=$(
-      curl -c cookies.txt -s -D - -o /dev/null \
-        'http://localhost:8052/api/v1/auth/login' \
-        -H 'content-type: application/json' \
-        --data-raw "{\"username\":\"admin\",\"password\":\"$DEFAULT_PASSWORD\"}" \
-      | awk -F'[=;]' '/Set-Cookie: BHToken=/{print $2}'
-      )
       #echo "文件夹不为空"
       # rclone sync $REMOTE_FOLDER /app --exclude="/baihu" --exclude "/docker-entrypoint.sh"
       mkdir /app/backup_tmp
