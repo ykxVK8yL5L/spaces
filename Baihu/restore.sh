@@ -27,9 +27,7 @@ if [ -n "$RCLONE_CONF" ]; then
   OUTPUT=$(rclone ls "$REMOTE_FOLDER" 2>&1)
   # 获取 rclone 命令的退出状态码
   EXIT_CODE=$?
-
-  echo "rclone退出代码:$EXIT_CODE"
-  
+  #echo "rclone退出代码:$EXIT_CODE"
   # 判断退出状态码
   if [ $EXIT_CODE -eq 0 ]; then
     # rclone 命令成功执行，检查文件夹是否为空
@@ -39,22 +37,25 @@ if [ -n "$RCLONE_CONF" ]; then
     else
       # 获取响应Token
       BHToken=$(
-      curl -s -D - -o /dev/null \
+      curl -c cookies.txt -s -D - -o /dev/null \
         'http://localhost:8052/api/v1/auth/login' \
         -H 'content-type: application/json' \
         --data-raw "{\"username\":\"admin\",\"password\":\"$DEFAULT_PASSWORD\"}" \
       | awk -F'[=;]' '/Set-Cookie: BHToken=/{print $2}'
       )
-      echo $BHToken
-
       #echo "文件夹不为空"
       # rclone sync $REMOTE_FOLDER /app --exclude="/baihu" --exclude "/docker-entrypoint.sh"
-      mkdir /app/backups
+      mkdir /app/backup_tmp
       # 找最新的文件名
-      latest_file=$(rclone lsjson remote:source | jq -r 'sort_by(.ModTime) | last | .Path')
+      latest_file=$(rclone lsjson $REMOTE_FOLDER | jq -r 'sort_by(.ModTime) | last | .Path')
       # 复制到目标目录
-      rclone copy remote:source/$latest_file /app/backups
-      ls /app/backups
+      rclone copy $REMOTE_FOLDER/$latest_file /app/backup_tmp
+      RESTORE_RESPON=$(curl -b cookies.txt "http://localhost:8052/api/v1/settings/restore" \
+        -F "file=@/app/backup_tmp/$latest_file;type=application/zip" \
+        -H "Accept: */*" \
+        --compressed
+      )
+      rm -rf /app/backup_tmp
     fi
   elif [[ "$OUTPUT" == *"directory not found"* ]]; then
     echo "错误：文件夹不存在"
