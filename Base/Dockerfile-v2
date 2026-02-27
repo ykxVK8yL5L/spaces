@@ -1,5 +1,5 @@
 # Use n8n v2 :https://github.com/yangshoulai/n8n
-FROM yangshoulai/n8n:2.8.2 as n8nbuilder
+FROM yangshoulai/n8n:2.10.1 as n8nbuilder
 FROM node:24-slim as nodebuilder
 FROM rclone/rclone:latest AS rclone
 
