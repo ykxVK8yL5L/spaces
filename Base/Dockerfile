@@ -81,7 +81,7 @@ ENV PATH=/npm-global/bin:$PATH
 
 RUN npm config set prefix '/npm-global'
 
-RUN npm install -g pnpm pm2 n8n@1.123.23
+RUN npm install -g pnpm pm2 n8n@1.123.22
 
 RUN mkdir /n8n-data
 RUN chmod -R 777 /var && \
