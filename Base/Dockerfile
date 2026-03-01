@@ -97,7 +97,7 @@ RUN chmod -R 777 /var && \
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.23.0-rc.2
 
 # Install ollama
-RUN curl -fsSL https://ollama.com/install.sh | sh
+# RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Create a user to run code-server
 RUN useradd -m -s /bin/zsh coder && \
