@@ -58,12 +58,14 @@ if [ -n "$RCLONE_CONF" ]; then
       latest_file=$(rclone lsjson $REMOTE_FOLDER | jq -r 'sort_by(.ModTime) | last | .Path')
       # 复制到目标目录
       rclone copy $REMOTE_FOLDER/$latest_file /app/backup_tmp
-      RESTORE_RESPON=$(curl -b cookies.txt "http://localhost:8052/api/v1/settings/restore" \
-        -F "file=@/app/backup_tmp/$latest_file;type=application/zip" \
-        -H "Accept: */*" \
-        --compressed
-      )
+      # RESTORE_RESPON=$(curl -b cookies.txt "http://localhost:8052/api/v1/settings/restore" \
+      #   -F "file=@/app/backup_tmp/$latest_file;type=application/zip" \
+      #   -H "Accept: */*" \
+      #   --compressed
+      # )
+      ./baihu restore /app/backup_tmp/$latest_file
       rm -rf /app/backup_tmp
+      pm2 restart baihu
     fi
   elif [[ "$OUTPUT" == *"directory not found"* ]]; then
     echo "错误：文件夹不存在"
