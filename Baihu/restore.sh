@@ -1,4 +1,9 @@
 
+# 设置Playwright环境 使用chrome
+pip install playwright
+playwright install-deps
+playwright install chrome
+
 npm install pm2 -g
 #开启白虎服务
 pm2 start "./baihu server" --name baihu
