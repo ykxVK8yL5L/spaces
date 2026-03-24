@@ -1,8 +1,8 @@
 
 # 设置Playwright环境 使用chrome
-pip install playwright
-playwright install-deps
-playwright install chrome
+python -m pip install playwright
+python -m playwright install-deps
+python -m playwright install chrome
 
 npm install pm2 -g
 #开启白虎服务
