@@ -7,7 +7,7 @@ BHToken=$(
 curl -c cookies.txt -s -D - -o /dev/null \
 'http://localhost:8052/api/v1/auth/login' \
 -H 'content-type: application/json' \
---data-raw "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}" \
+--data-raw "{\"username\":\"$USERNAME\",\"password\":\"$ADMIN_PASSWORD\"}" \
 | awk -F'[=;]' '/Set-Cookie: BHToken=/{print $2}'
 )
 echo "登陆成功Token为:$BHToken,开始请求备份"
