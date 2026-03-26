@@ -1,8 +1,13 @@
 
 # 设置Playwright环境 使用chrome
-python -m pip install playwright
+# python -m pip install playwright
+# python -m playwright install-deps
+# python -m playwright install chrome
+# 弃用Playwright改用cloakbrowser
+python -m pip install cloakbrowser
+python -m cloakbrowser install
+python -m cloakbrowser info
 python -m playwright install-deps
-python -m playwright install chrome
 
 npm install pm2 -g
 #开启白虎服务
