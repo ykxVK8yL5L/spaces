@@ -8,6 +8,8 @@ python -m pip install cloakbrowser
 python -m cloakbrowser install
 python -m cloakbrowser info
 python -m playwright install-deps
+# 创建虚拟显示环境 如需调用export DISPLAY=:99
+Xvfb :99 -screen 0 1920x1080x24 &
 
 npm install pm2 -g
 #开启白虎服务
