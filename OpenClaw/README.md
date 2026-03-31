@@ -8,6 +8,10 @@ pinned: false
 short_description: 麻辣小龙虾
 ---
 
+如需要设置TG机器人可将start-openclaw.sh中的示例代码进行修改并使用
+注意Telegarm的设置为pairing即配对模式。需要向机器人发送/pair获取配对代码，然后在龙虾中执行配对代码即可   
+
+
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference   
 Secrets：   
 RCLONE_CONF:rclone配置内容   
