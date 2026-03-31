@@ -1,0 +1,79 @@
+#!/bin/sh
+# 文件名: sync.sh
+# 用法: ./sync.sh backup 或 ./sync.sh restore
+# 兼容 /bin/sh，OPENCLAW_PATHS 可换行声明
+
+# ----------------------------
+# 配置部分
+# ----------------------------
+
+# 远程备份目录（Dockerfile 或环境变量中可声明）
+# 示例: REMOTE_FOLDER="huggingface:/openclaw"
+: "${REMOTE_FOLDER:?请在环境变量中设置 REMOTE_FOLDER}"
+
+# 定义要备份的路径，用空格分隔，换行使用反斜杠
+OPENCLAW_PATHS="\
+/root/.openclaw/sessions \
+/root/.openclaw/workspace \
+/root/.openclaw/agents/main/sessions \
+/root/.openclaw/openclaw.json"
+
+BACKUP_FILENAME="openclaw_backup.tar.gz"
+TMP_BACKUP="/tmp/$BACKUP_FILENAME"
+
+# ----------------------------
+# 方法：备份
+# ----------------------------
+backup() {
+    echo "=== 创建备份文件 ==="
+    tar -czf "$TMP_BACKUP" $OPENCLAW_PATHS || {
+        echo "失败: 创建备份失败!"
+        return 1
+    }
+
+    echo "=== 上传备份文件到远程 ==="
+    rclone copy "$TMP_BACKUP" "$REMOTE_FOLDER/" --progress || {
+        echo "失败: 上传备份失败!"
+        return 1
+    }
+
+    echo "✅ 备份上传成功!"
+}
+
+# ----------------------------
+# 方法：还原
+# ----------------------------
+restore() {
+    echo "=== 检查远程备份文件是否存在 ==="
+    if rclone ls "$REMOTE_FOLDER/$BACKUP_FILENAME" >/dev/null 2>&1; then
+        echo "=== 下载远程备份到本地 ==="
+        rclone copy "$REMOTE_FOLDER/$BACKUP_FILENAME" "/tmp/" --progress
+
+        echo "=== 解压备份文件 ==="
+        tar -xzf "$TMP_BACKUP" -C / || {
+            echo "失败: 解压备份文件失败!"
+            return 1
+        }
+
+        echo "✅ 还原完成!"
+    else
+        echo "⚠️ 没有发现远程备份文件!"
+        return 1
+    fi
+}
+
+# ----------------------------
+# 命令行参数处理
+# ----------------------------
+case "$1" in
+    backup)
+        backup
+        ;;
+    restore)
+        restore
+        ;;
+    *)
+        echo "Usage: $0 {backup|restore}"
+        exit 1
+        ;;
+esac
