@@ -161,8 +161,8 @@ else
     echo "没有检测到Rclone配置信息"
 fi
 
-
-nginx -t && nginx || { echo "nginx 配置失败"; cat /var/log/nginx/error.log; exit 1; }
+# 7. 运行
+openclaw doctor --fix
 
 # 启动定时备份 (每 5 分钟)
 # (while true; do
@@ -171,7 +171,20 @@ nginx -t && nginx || { echo "nginx 配置失败"; cat /var/log/nginx/error.log; 
 #   ./sync.sh backup
 # done) &
 
-# 7. 运行
-openclaw doctor --fix
+nginx -t
+if [ $? -ne 0 ]; then
+  echo "nginx 配置失败"
+  cat /var/log/nginx/error.log
+  exit 1
+fi
 
-exec openclaw gateway run --port 7861
+# 启动 nginx 前台运行
+nginx -g 'daemon off;' &
+
+# 使用 pm2 启动 openclaw
+pm2 start "openclaw gateway run --port 7861" --name openclaw
+
+# 使用 pm2 持续运行，保持容器不退出 需要的话开启
+# pm2 logs
+
+tail -f /dev/null

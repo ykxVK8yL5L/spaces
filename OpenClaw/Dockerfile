@@ -12,7 +12,7 @@ RUN pip3 install --no-cache-dir huggingface_hub --break-system-packages
 RUN rclone config -h
 
 # 3. 安装 OpenClaw
-RUN npm install -g openclaw@latest --unsafe-perm
+RUN npm install -g pm2 openclaw@latest --unsafe-perm 
 
 # 4. 设置工作目录并拷贝脚本
 WORKDIR /app
