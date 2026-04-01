@@ -164,7 +164,7 @@ fi
 # 7. 运行
 openclaw doctor --fix
 
-# 启动定时备份 (每 5 分钟)
+# 启动定时备份
 # (while true; do
 #   sleep 3600
 #   echo ">>> Running scheduled backup..."
