@@ -25,17 +25,32 @@ TMP_BACKUP="/tmp/$BACKUP_FILENAME"
 # 方法：备份
 # ----------------------------
 backup() {
-    echo "=== 创建备份文件 ==="
-    tar -czf "$TMP_BACKUP" $OPENCLAW_PATHS || {
-        echo "失败: 创建备份失败!"
-        return 1
-    }
+    # echo "=== 创建备份文件 ==="
+    # tar -czf "$TMP_BACKUP" $OPENCLAW_PATHS || {
+    #     echo "失败: 创建备份失败!"
+    #     return 1
+    # }
 
-    echo "=== 上传备份文件到远程 ==="
-    rclone copy "$TMP_BACKUP" "$REMOTE_FOLDER/" --progress || {
-        echo "失败: 上传备份失败!"
-        return 1
-    }
+    # echo "=== 上传备份文件到远程 ==="
+    # rclone copy "$TMP_BACKUP" "$REMOTE_FOLDER/" --progress || {
+    #     echo "失败: 上传备份失败!"
+    #     return 1
+    # }
+    echo "=== 开始备份 ==="
+    # 遍历每个路径
+    for path in $OPENCLAW_PATHS; do
+        name=$(basename "$path")
+        # 判断是文件还是目录
+        if [ -d "$path" ]; then
+            # 文件夹 → 使用 sync 保证完全一致
+            rclone sync "$path" "$REMOTE_FOLDER/$name" --checksum --progress --create-empty-src-dirs
+        elif [ -f "$path" ]; then
+            # 文件 → 用 copy 覆盖
+            rclone copy "$path" "$REMOTE_FOLDER/" --checksum --progress
+        else
+            echo "⚠️ 路径不存在: $path"
+        fi
+    done
 
     echo "✅ 备份上传成功!"
 }
@@ -44,22 +59,29 @@ backup() {
 # 方法：还原
 # ----------------------------
 restore() {
-    echo "=== 检查远程备份文件是否存在 ==="
-    if rclone ls "$REMOTE_FOLDER/$BACKUP_FILENAME" >/dev/null 2>&1; then
-        echo "=== 下载远程备份到本地 ==="
-        rclone copy "$REMOTE_FOLDER/$BACKUP_FILENAME" "/tmp/" --progress
-
-        echo "=== 解压备份文件 ==="
-        tar -xzf "$TMP_BACKUP" -C / || {
-            echo "失败: 解压备份文件失败!"
-            return 1
-        }
-
-        echo "✅ 还原完成!"
-    else
-        echo "⚠️ 没有发现远程备份文件!"
-        return 1
-    fi
+    # echo "=== 检查远程备份文件是否存在 ==="
+    # if rclone ls "$REMOTE_FOLDER/$BACKUP_FILENAME" >/dev/null 2>&1; then
+    #     echo "=== 下载远程备份到本地 ==="
+    #     rclone copy "$REMOTE_FOLDER/$BACKUP_FILENAME" "/tmp/" --progress
+    #     echo "=== 解压备份文件 ==="
+    #     tar -xzf "$TMP_BACKUP" -C / || {
+    #         echo "失败: 解压备份文件失败!"
+    #         return 1
+    #     }
+    #     echo "✅ 还原完成!"
+    # else
+    #     echo "⚠️ 没有发现远程备份文件!"
+    #     return 1
+    # fi
+    echo "=== 开始还原备份 ==="
+    for path in $OPENCLAW_PATHS; do
+        # 获取相对目录名
+        name=$(basename "$path")
+        # 判断本地是文件还是文件夹
+        echo "🔄 还原 $name ..."
+        # 直接从远程覆盖到本地
+        rclone copy "$REMOTE_FOLDER/$name" "$path" --checksum --progress --create-empty-src-dirs
+    done
 }
 
 # ----------------------------
