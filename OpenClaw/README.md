@@ -18,7 +18,10 @@ OPENAI_API_KEY:AI的key目前代码中用的是OpenAI的
 MODEL:AI调用的模型   
 OPENCLAW_GATEWAY_PASSWORD:龙虾前台管理密码   
 
-
+# 关于备份可以让AI建立定时任务执行以下代码
+```
+sh /app/sync.sh backup
+```
 ## Telegram机器人注意事项：
 - 抱脸不支持TG的api需要设置Telegram API Root URL
 - WebHook地址为：https://抱脸用户名-抱脸空间名.hf.space/telegram/webhook
