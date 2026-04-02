@@ -77,7 +77,7 @@ restore() {
     for path in $OPENCLAW_PATHS; do
         name=$(basename "$path")
         echo "🔄 还原 $name ..."
-        if [[ "$path" == *.json ]]; then
+        if [ "${path%/}" != "$path" ]; then
             # 👉 文件：复制到父目录
             target_dir=$(dirname "$path")
             mkdir -p "$target_dir"
