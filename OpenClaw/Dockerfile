@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip3 install --no-cache-dir huggingface_hub --break-system-packages
 
 # Install code-server
-RUN curl -L https://coder.com/install.sh | sh
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # 2、创建rclone配置文件夹
 RUN rclone config -h
