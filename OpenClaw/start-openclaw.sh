@@ -51,6 +51,12 @@ cat > /root/.openclaw/openclaw.json <<EOF
   "commands": {
     "restart": true
   },
+  "tools": {
+      "exec": {
+        "ask": "off",
+        "security": "full"
+      }
+    },
   "gateway": {
     "mode": "local",
     "bind": "lan",
