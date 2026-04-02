@@ -13,9 +13,9 @@
 
 # 定义要备份的路径，用空格分隔，换行使用反斜杠
 OPENCLAW_PATHS="\
-/root/.openclaw/sessions \
-/root/.openclaw/workspace \
-/root/.openclaw/agents/main/sessions \
+/root/.openclaw/sessions/ \
+/root/.openclaw/workspace/ \
+/root/.openclaw/agents/main/sessions/ \
 /root/.openclaw/openclaw.json"
 
 BACKUP_FILENAME="openclaw_backup.tar.gz"
@@ -75,12 +75,20 @@ restore() {
     # fi
     echo "=== 开始还原备份 ==="
     for path in $OPENCLAW_PATHS; do
-        # 获取相对目录名
         name=$(basename "$path")
-        # 判断本地是文件还是文件夹
         echo "🔄 还原 $name ..."
-        # 直接从远程覆盖到本地
-        rclone copy "$REMOTE_FOLDER/$name" "$path" --checksum --progress --create-empty-src-dirs
+        if [[ "$path" == *.json ]]; then
+            # 👉 文件：复制到父目录
+            target_dir=$(dirname "$path")
+            mkdir -p "$target_dir"
+            rclone copy "$REMOTE_FOLDER/$name" "$target_dir" \
+                --checksum --progress
+        else
+            # 👉 目录：正常处理
+            mkdir -p "$path"
+            rclone copy "$REMOTE_FOLDER/$name" "$path" \
+                --checksum --progress --create-empty-src-dirs
+        fi
     done
 }
 
