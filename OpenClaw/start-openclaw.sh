@@ -113,6 +113,22 @@ http {
             proxy_set_header Connection $connection_upgrade;
             proxy_set_header X-Forwarded-Host $host;
         }
+
+        location /coder/ {
+            proxy_pass http://127.0.0.1:7862/;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_buffering off;
+            proxy_redirect default;
+            proxy_connect_timeout 1800;
+            proxy_send_timeout 1800;
+            proxy_read_timeout 1800;  
+        }
         
         location /telegram/webhook {
             proxy_pass http://127.0.0.1:8787;
@@ -183,6 +199,12 @@ nginx -g 'daemon off;' &
 
 # 使用 pm2 启动 openclaw
 pm2 start "openclaw gateway run --port 7861" --name openclaw
+
+echo -e "======================启动code-server服务========================\n"
+export PASSWORD=$OPENCLAW_GATEWAY_PASSWORD
+pm2 start "code-server --bind-addr 0.0.0.0:7862 --port 7862" --name "code-server"
+pm2 startup
+pm2 save
 
 # 使用 pm2 持续运行，保持容器不退出 需要的话开启
 # pm2 logs
