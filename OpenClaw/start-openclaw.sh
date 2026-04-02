@@ -63,7 +63,7 @@ cat > /root/.openclaw/openclaw.json <<EOF
       "allowedOrigins": ["*"],
       "dangerouslyDisableDeviceAuth": true,
       "dangerouslyAllowHostHeaderOriginFallback": true
-    },
+    }
   }
 }
 EOF
