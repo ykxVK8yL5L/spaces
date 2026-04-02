@@ -92,11 +92,15 @@ events {
 }
 
 http {
-    map $http_upgrade $connection_upgrade {
-        default upgrade;
-        ''      close;
+   upstream codeServer {
+      server 0.0.0.0:7862;
     }
-
+    
+    map $http_upgrade $connection_upgrade {
+      default keep-alive;
+      'websocket' upgrade;
+    }
+    
     server {
         listen 7860;
         server_name _;
@@ -115,7 +119,7 @@ http {
         }
 
         location /coder/ {
-            proxy_pass http://127.0.0.1:7862/;
+            proxy_pass http://codeServer/;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Host $http_host;
             proxy_set_header X-NginX-Proxy true;
@@ -129,6 +133,7 @@ http {
             proxy_send_timeout 1800;
             proxy_read_timeout 1800;  
         }
+
         
         location /telegram/webhook {
             proxy_pass http://127.0.0.1:8787;
