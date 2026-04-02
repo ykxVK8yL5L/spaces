@@ -44,3 +44,5 @@ sh /app/sync.sh backup
     }
   }
 ```
+## 备份文件要注意 sync.sh里的文件夹要以/结尾
+
