@@ -3,7 +3,7 @@ FROM node:22-slim
 ENV REMOTE_FOLDER="huggingface:/openclaw"
 # 1. 基础依赖
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git openssh-client build-essential python3 python3-pip \ 
+    curl git openssh-client build-essential python3 python3-pip \ 
     g++ rclone nginx make ca-certificates && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir huggingface_hub --break-system-packages
