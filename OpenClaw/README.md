@@ -7,7 +7,7 @@ sdk: docker
 pinned: false
 short_description: 麻辣小龙虾
 ---
-
+# 内置code-server 访问地址为：/coder/
 # 请先确认你Rclone的文件中的openclaw文件夹存在
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference   
