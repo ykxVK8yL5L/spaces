@@ -50,7 +50,9 @@ echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
 
 if [ -n "$RCLONE_CONF" ]; then
   echo "##########同步备份############"
-
+  # 为了防止不存在备份目录报错直接执行创建命令，如果存在也不会受影响
+  rclone mkdir $REMOTE_FOLDER
+  
   # 使用 rclone ls 命令列出文件夹内容，将输出和错误分别捕获
   OUTPUT=$(rclone ls "$REMOTE_FOLDER" 2>&1)
   # 获取 rclone 命令的退出状态码
